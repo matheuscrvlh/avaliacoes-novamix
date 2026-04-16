@@ -1,73 +1,92 @@
-# React + TypeScript + Vite
+# Novamix – Avaliação de Atendimento
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Front-end de avaliação de atendimento da **Novamix Food Service**, desenvolvido com React + TypeScript + Tailwind CSS.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 🚀 Como rodar
 
-## React Compiler
+```bash
+# 1. Instale as dependências
+npm install
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+# 2. Configure a URL do back-end
+cp .env.example .env
+# Abra o .env e altere VITE_API_URL para a URL real do servidor
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+# 3. Suba o servidor de desenvolvimento
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Acesse em `http://localhost:5173`.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+---
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## 🏗️ Estrutura do projeto
+
 ```
+src/
+├── components/
+│   ├── ui/
+│   │   ├── StarRating.tsx          # Componente de estrelas (1–5)
+│   │   ├── TextAreaComentario.tsx  # Campo de texto opcional
+│   │   ├── SubmitButton.tsx        # Botão com estado de loading
+│   │   └── ErrorAlert.tsx          # Alerta de erro
+│   ├── AvaliacaoForm.tsx           # Formulário completo
+│   └── AvaliacaoSucesso.tsx        # Tela de confirmação
+├── hooks/
+│   └── useAvaliacao.ts             # Lógica de estado e envio
+├── lib/
+│   └── api.ts                      # Chamada HTTP (POST /avaliacoes)
+├── pages/
+│   └── AvaliacaoPage.tsx           # Página principal
+├── types/
+│   └── avaliacao.ts                # Tipos e constantes compartilhados
+├── App.tsx
+├── main.tsx
+└── index.css
+```
+
+---
+
+## 📡 Integração com o back-end
+
+O arquivo `src/lib/api.ts` faz a chamada:
+
+```
+POST /avaliacoes
+Content-Type: application/json
+
+{
+  "nota": 4,
+  "comentario": "Ótimo atendimento!" // ou null se não preenchido
+}
+```
+
+Para apontar para a URL correta, basta editar o `.env`:
+
+```
+VITE_API_URL=https://api.seuservidor.com
+```
+
+---
+
+## 🎨 Cores da marca
+
+| Variável Tailwind            | Hex       |
+|-----------------------------|-----------|
+| `novamix-orange`            | `#ff8d0a` |
+| `novamix-orange-dk`         | `#ea8006` |
+| `novamix-teal`              | `#00817d` |
+| `novamix-amber`             | `#ff7f00` |
+| `novamix-cream`             | `#FFF8F0` |
+
+---
+
+## 🛠️ Build para produção
+
+```bash
+npm run build
+```
+
+Os arquivos finais ficam na pasta `dist/`.
