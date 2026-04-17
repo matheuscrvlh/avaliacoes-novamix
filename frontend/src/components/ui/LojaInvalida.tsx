@@ -18,7 +18,7 @@ export default function LojaInvalida() {
           </svg>
         </div>
         <h2 className="text-xl font-extrabold mb-2 text-gray-700 font-display">
-          Loja não encontrada
+          Loja não encontrada!
         </h2>
         <p className="text-gray-400 text-sm leading-relaxed">
           O link que você acessou não contém uma loja válida. <br />
