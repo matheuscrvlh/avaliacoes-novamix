@@ -5,6 +5,7 @@ import ErrorAlert from "@/components/ui/ErrorAlert";
 import type { SubmitStatus } from "@/types/avaliacao";
 
 interface AvaliacaoFormProps {
+  nomeLoja: string;
   nota: number;
   onNotaChange: (nota: number) => void;
   comentario: string;
@@ -15,6 +16,7 @@ interface AvaliacaoFormProps {
 }
 
 export default function AvaliacaoForm({
+  nomeLoja,
   nota,
   onNotaChange,
   comentario,
@@ -33,7 +35,8 @@ export default function AvaliacaoForm({
         <h1 className="text-white text-2xl font-extrabold leading-tight font-display">
           Avalie nosso Atendimento
         </h1>
-        <p className="text-white/75 text-sm mt-2">
+        <p className="text-white/90 text-sm font-bold mt-1">{nomeLoja}</p>
+        <p className="text-white/65 text-xs mt-1">
           Sua opinião é muito importante para nós 🍴
         </p>
       </div>
@@ -44,10 +47,7 @@ export default function AvaliacaoForm({
 
         <hr className="border-gray-100 my-4" />
 
-        <TextAreaComentario
-          value={comentario}
-          onChange={onComentarioChange}
-        />
+        <TextAreaComentario value={comentario} onChange={onComentarioChange} />
 
         {status === "error" && <ErrorAlert message={errorMsg} />}
 

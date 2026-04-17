@@ -2,7 +2,7 @@ import { useState, useCallback } from "react";
 import { postAvaliacao } from "@/lib/api";
 import type { SubmitStatus } from "@/types/avaliacao";
 
-export function useAvaliacao() {
+export function useAvaliacao(lojaId: number) {
   const [nota, setNota] = useState<number>(0);
   const [comentario, setComentario] = useState<string>("");
   const [status, setStatus] = useState<SubmitStatus>("idle");
@@ -15,7 +15,7 @@ export function useAvaliacao() {
     setErrorMsg("");
 
     try {
-      await postAvaliacao({
+      await postAvaliacao(lojaId, {
         nota,
         comentario: comentario.trim() || null,
       });
@@ -26,7 +26,7 @@ export function useAvaliacao() {
       );
       setStatus("error");
     }
-  }, [nota, comentario]);
+  }, [lojaId, nota, comentario]);
 
   const reset = useCallback(() => {
     setNota(0);
