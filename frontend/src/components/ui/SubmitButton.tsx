@@ -6,7 +6,11 @@ interface SubmitButtonProps {
   onClick: () => void;
 }
 
-export default function SubmitButton({ status, disabled, onClick }: SubmitButtonProps) {
+export default function SubmitButton({
+  status,
+  disabled,
+  onClick,
+}: SubmitButtonProps) {
   return (
     <>
       <button
@@ -14,39 +18,36 @@ export default function SubmitButton({ status, disabled, onClick }: SubmitButton
         onClick={onClick}
         disabled={disabled}
         className="
-          mt-5 w-full rounded-xl py-3.5
-          text-white font-extrabold text-sm tracking-wide shadow-md
-          bg-gradient-to-br from-novamix-orange to-novamix-orange-dk
-          transition-all duration-150
-          hover:not-disabled:opacity-90 hover:not-disabled:-translate-y-px
-          active:not-disabled:translate-y-0
-          disabled:opacity-40 disabled:cursor-not-allowed
-        "
+    group relative overflow-hidden
+    mt-5 w-full rounded-xl py-3.5
+    text-white font-extrabold text-sm tracking-wide shadow-md
+    bg-gradient-to-br from-novamix-orange to-novamix-orange-dk
+    transition-all duration-300 ease-out
+
+    hover:not-disabled:scale-[1.02]
+    hover:not-disabled:shadow-lg
+    hover:not-disabled:-translate-y-1
+
+    active:not-disabled:scale-[0.98]
+
+    disabled:opacity-40 disabled:cursor-not-allowed
+  "
       >
-        {status === "loading" ? (
-          <span className="flex items-center justify-center gap-2">
-            <svg
-              className="animate-spin h-4 w-4 text-white"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <circle
-                className="opacity-25"
-                cx="12" cy="12" r="10"
-                stroke="currentColor" strokeWidth="4"
-              />
-              <path
-                className="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 100 16v-4l-3 3 3 3v-4a8 8 0 01-8-8z"
-              />
-            </svg>
-            Enviando...
-          </span>
-        ) : (
-          "Enviar Avaliação"
-        )}
+        {/* brilho */}
+        <span
+          className="
+      absolute inset-0
+      bg-gradient-to-r from-transparent via-white/30 to-transparent
+      translate-x-[-100%]
+      group-hover:translate-x-[100%]
+      transition-transform duration-700
+    "
+        />
+
+        {/* conteúdo */}
+        <span className="relative z-10">
+          {status === "loading" ? "Enviando..." : "Enviar Avaliação"}
+        </span>
       </button>
 
       {disabled && status !== "loading" && (
