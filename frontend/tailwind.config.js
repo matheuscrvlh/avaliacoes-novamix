@@ -5,7 +5,7 @@ export default {
     extend: {
       colors: {
         novamix: {
-          orange: "#ff8d0a",
+          orange: "blue",
           "orange-dk": "#ea8006",
           teal: "#00817d",
           amber: "#ff7f00",

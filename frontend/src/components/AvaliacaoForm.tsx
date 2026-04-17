@@ -29,9 +29,11 @@ export default function AvaliacaoForm({
     <div className="bg-white rounded-3xl shadow-xl w-full max-w-md overflow-hidden">
       {/* Header */}
       <div className="px-8 pt-8 pb-6 text-center bg-gradient-to-br from-novamix-orange to-novamix-orange-dk">
-        <p className="text-white/80 text-xs font-bold uppercase tracking-widest mb-1">
-          Novamix Food Service
-        </p>
+        <img
+          src="/logo.webp"
+          alt="Novamix Food Service"
+          className="h-10 mx-auto mb-2 object-contain"
+        />
         <h1 className="text-novamix-teal text-2xl font-extrabold leading-tight font-poppins">
           Avalie nosso Atendimento
         </h1>
