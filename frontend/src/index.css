@@ -2,12 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ── Fonte padrão ───────────────────────────────────── */
+
 * {
-  font-family: "Nunito", sans-serif;
+  font-family: "Montserrat", sans-serif;
 }
 
-/* ── Scrollbar customizada (opcional) ──────────────── */
+/* Scrollbar customizada  */
 ::-webkit-scrollbar {
   width: 6px;
 }

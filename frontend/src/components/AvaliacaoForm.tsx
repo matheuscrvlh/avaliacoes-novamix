@@ -32,11 +32,11 @@ export default function AvaliacaoForm({
         <p className="text-white/80 text-xs font-bold uppercase tracking-widest mb-1">
           Novamix Food Service
         </p>
-        <h1 className="text-white text-2xl font-extrabold leading-tight font-display">
+        <h1 className="text-novamix-teal text-2xl font-extrabold leading-tight font-poppins">
           Avalie nosso Atendimento
         </h1>
         <p className="text-white/90 text-sm font-bold mt-1">{nomeLoja}</p>
-        <p className="text-white/65 text-xs mt-1">
+        <p className="text-white/65 text-xs mt-2">
           Sua opinião é muito importante para nós 🍴
         </p>
       </div>

@@ -10,7 +10,7 @@ export interface LojaInfo {
   nome: string;
 }
 
-/** Lojas cadastradas — ajuste os nomes conforme necessário */
+/* Lojas cadastradas  */
 export const LOJAS: Record<number, LojaInfo> = {
   1: { id: 1, nome: "Loja Prado" },
   2: { id: 2, nome: "Loja Centro" },
