@@ -20,7 +20,7 @@ export default function AvaliacaoPage() {
   if (!loja) return <LojaInvalida />;
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-novamix-cream p-4">
+    <div className="min-h-screen flex items-center justify-center bg-novamix-berylline p-4">
       {status === "success" ? (
         <AvaliacaoSucesso onReset={reset} />
       ) : (

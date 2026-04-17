@@ -8,6 +8,7 @@ export default {
           orange: "#ff8d0a",
           "orange-dk": "#ea8006",
           teal: "#00817d",
+          berylline: "#00817d45",
           amber: "#ff7f00",
           cream: "#FFF8F0",
         },
