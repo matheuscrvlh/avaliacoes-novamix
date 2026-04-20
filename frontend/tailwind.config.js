@@ -5,10 +5,10 @@ export default {
     extend: {
       colors: {
         novamix: {
-          orange: "#ff8d0a",
+          orange: "#ff8d0a6e",
           "orange-dk": "#ea8006",
           teal: "#00817d",
-          berylline: "#00817d45",
+          berylline: "#c2a98b1c",
           amber: "#ff7f00",
           cream: "#FFF8F0",
         },
