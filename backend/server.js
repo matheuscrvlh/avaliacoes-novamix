@@ -11,7 +11,7 @@ const dashboard = require('./routes/dashboard')
 app.use('/avaliacoes', avaliacoes)
 app.use('/dashboard', dashboard)
 
-const PORT = 3001
+const PORT = 3002
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`)
 })

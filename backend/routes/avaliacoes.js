@@ -3,17 +3,18 @@ const router = express.Router()
 const Database = require('better-sqlite3')
 const db = new Database('./database/banco.db')
 
-router.post('/', (req, res) => {
-  const { filial, nota, comentario } = req.body
+router.post('/loja/:lojaId', (req, res) => {
+  const { lojaId } = req.params
+  const { nota, comentario } = req.body
 
-  if (!filial || !nota) {
-    return res.status(400).json({ erro: 'Filial e nota são obrigatórios' })
+  if (!lojaId || !nota) {
+    return res.status(400).json({ erro: 'Loja e nota são obrigatórios' })
   }
 
   const stmt = db.prepare(
     'INSERT INTO avaliacoes (filial, nota, comentario) VALUES (?, ?, ?)'
   )
-  stmt.run(filial, nota, comentario || null)
+  stmt.run(lojaId, nota, comentario || null)
 
   res.json({ sucesso: true })
 })

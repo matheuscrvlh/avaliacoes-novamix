@@ -2,7 +2,7 @@
 import type { AvaliacaoPayload } from "@/types/avaliacao";
 
 /** Troque pela URL real do back-end quando estiver pronto */
-const BASE_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
+const BASE_URL = import.meta.env.VITE_API_URL ?? "/api";
 
 /**
  * Envia uma avaliação para POST /avaliacoes/loja/:lojaId
