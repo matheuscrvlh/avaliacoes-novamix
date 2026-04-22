@@ -1,0 +1,16 @@
+services:
+  backend:
+    build: ./backend
+    container_name: avaliacoes-backend
+    restart: always
+    volumes:
+      - ./backend/database:/app/database  # persiste o SQLite
+
+  frontend:
+    build: ./frontend
+    container_name: avaliacoes-frontend
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - backend

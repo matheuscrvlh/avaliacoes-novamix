@@ -20,12 +20,14 @@ export function useDashboard() {
 
         const dadosFormatados = res.map((a: any) => ({
           id: a.id,
-          idfilial: a.filial,
-          nomefilial: a.filial,
+          idfilial: a.idfilial,
+          nomefilial: a.nomefilial,
           nota: a.nota,
           comentario: a.comentario,
           data: a.criado_em,
         }));
+
+        console.log(dadosFormatados)
 
         setAvaliacoes(dadosFormatados);
       } catch {

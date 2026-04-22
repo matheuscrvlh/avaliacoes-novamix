@@ -21,8 +21,10 @@ export async function getAvaliacoes() {
       method: "GET",
       headers: { "Content-Type": "application/json" },
     })
-
-    return response.json()
+    
+    const res = await response.json()
+    console.log(res)
+    return res
   } catch(err) {
     console.error('Erro ao buscar avaliacoes', err)
   }
