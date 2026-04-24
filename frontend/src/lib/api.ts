@@ -1,7 +1,7 @@
 /// <reference types="vite/client" />
 import type { AvaliacaoPayload } from "@/types/avaliacao";
 
-const BASE_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3002";
+const BASE_URL = import.meta.env.VITE_API_URL ?? "https://avaliacoes.lojanovamix.com.br/api";
 
 // Funcao de pegar loja
 const LOJAS: Record<number, string> = {
