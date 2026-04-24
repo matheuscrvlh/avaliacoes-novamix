@@ -36,7 +36,7 @@ export function AvaliacoesTable({
         <select
           value={filterLoja}
           onChange={(e) => onFilterLoja(e.target.value)}
-          className="text-sm border border-zinc-700 rounded-lg px-3 py-1.5 bg-zinc-800 text-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-600"
+          className="text-sm border border-zinc-300 rounded-lg px-3 py-1.5 shadow-lg text-black focus:outline-none focus:ring-2 focus:ring-zinc-600"
         >
           <option value="all">Todas as lojas</option>
           {lojas.map(([id, nome]) => (
@@ -48,7 +48,7 @@ export function AvaliacoesTable({
         <select
           value={filterNota}
           onChange={(e) => onFilterNota(e.target.value)}
-          className="text-sm border border-zinc-700 rounded-lg px-3 py-1.5 bg-zinc-800 text-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-600"
+          className="text-sm border border-zinc-300 rounded-lg px-3 py-1.5 shadow-lg text-black focus:outline-none focus:ring-2 focus:ring-zinc-600"
         >
           <option value="all">Todas as notas</option>
           {[5, 4, 3, 2, 1].map((n) => (
@@ -63,7 +63,7 @@ export function AvaliacoesTable({
               onFilterLoja("all");
               onFilterNota("all");
             }}
-            className="text-xs text-zinc-500 hover:text-zinc-300 underline"
+            className="text-xs text-zinc-500 hover:text-black underline"
           >
             Limpar filtros
           </button>
@@ -71,28 +71,28 @@ export function AvaliacoesTable({
       </div>
 
       {/* Tabela */}
-      <div className="bg-zinc-800 border border-zinc-700 rounded-xl overflow-hidden">
+      <div className="bg-white shadow-md rounded-xl overflow-hidden">
         <table className="w-full text-sm">
           <thead>
-            <tr className="bg-zinc-900 border-b border-zinc-700">
-              <th className="text-left text-xs font-medium text-zinc-500 px-4 py-3 w-12">
+            <tr className="bg-[#ff8d0acf] border-b border-zinc-700">
+              <th className="text-left text-xs font-medium text-white px-4 py-3 w-12">
                 #
               </th>
-              <th className="text-left text-xs font-medium text-zinc-500 px-4 py-3">
+              <th className="text-left text-xs font-medium text-white px-4 py-3">
                 Loja
               </th>
-              <th className="text-left text-xs font-medium text-zinc-500 px-4 py-3 w-32">
+              <th className="text-left text-xs font-medium text-white px-4 py-3 w-32">
                 Nota
               </th>
-              <th className="text-left text-xs font-medium text-zinc-500 px-4 py-3">
+              <th className="text-left text-xs font-medium text-white px-4 py-3">
                 Comentário
               </th>
-              <th className="text-left text-xs font-medium text-zinc-500 px-4 py-3 w-28">
+              <th className="text-left text-xs font-medium text-white px-4 py-3 w-28">
                 Data
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-zinc-700/50">
+          <tbody className="divide-y divide-slate-500/50">
             {data.length === 0 ? (
               <tr>
                 <td
@@ -106,16 +106,16 @@ export function AvaliacoesTable({
               data.map((a) => (
                 <tr
                   key={a.id}
-                  className="hover:bg-zinc-700/30 transition-colors"
+                  className="hover:bg-[#ff8d0a34] transition-colors"
                 >
                   <td className="px-4 py-3 text-zinc-600">{a.id}</td>
-                  <td className="px-4 py-3 text-zinc-200 font-medium">
+                  <td className="px-4 py-3 text-black font-semibold">
                     {a.nomefilial}
                   </td>
                   <td className="px-4 py-3">
                     <NotaBadge nota={Number(a.nota)} />
                   </td>
-                  <td className="px-4 py-3 text-zinc-400 max-w-xs">
+                  <td className="px-4 py-3 text-gray-500 max-w-xs">
                     {a.comentario?.trim() ? (
                       <span className="line-clamp-2">{a.comentario}</span>
                     ) : (

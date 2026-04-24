@@ -40,13 +40,13 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="p-6 space-y-6 max-w-6xl mx-auto">
+    <div className="p-6 space-y-6 max-w-6xl mx-auto shadow-lg bg-[#f5f5f5]">
       {/* Header */}
       <div>
-        <h1 className="text-xl font-semibold text-zinc-100">
-          Avaliações das lojas
+        <h1 className="text-xl font-semibold text-[#EA8006]">
+          AVALIAÇÕES DAS LOJAS
         </h1>
-        <p className="text-sm text-zinc-500 mt-0.5">
+        <p className="text-sm text-zinc-500 mt-0.5 und">
           {metrics.total} avaliações no total
         </p>
       </div>
