@@ -24,7 +24,7 @@ export function useDashboard() {
           nomefilial: a.nomefilial,
           nota: a.nota,
           comentario: a.comentario,
-          data: a.criado_em,
+          data: a.data,
         }));
 
         console.log(dadosFormatados)
