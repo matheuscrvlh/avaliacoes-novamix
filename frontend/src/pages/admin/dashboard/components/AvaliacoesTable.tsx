@@ -33,10 +33,11 @@ export function AvaliacoesTable({
       {/* Filtros */}
       <div className="flex flex-wrap items-center gap-3 mb-3">
         <span className="text-sm text-zinc-500">Filtrar por:</span>
+
         <select
           value={filterLoja}
           onChange={(e) => onFilterLoja(e.target.value)}
-          className="text-sm border border-zinc-300 rounded-lg px-3 py-1.5 shadow-lg text-black focus:outline-none focus:ring-2 focus:ring-zinc-600"
+          className="text-sm border border-zinc-300 rounded-lg px-3 py-1.5 shadow-sm text-black focus:outline-none focus:ring-2 focus:ring-orange-400"
         >
           <option value="all">Todas as lojas</option>
           {lojas.map(([id, nome]) => (
@@ -45,10 +46,11 @@ export function AvaliacoesTable({
             </option>
           ))}
         </select>
+
         <select
           value={filterNota}
           onChange={(e) => onFilterNota(e.target.value)}
-          className="text-sm border border-zinc-300 rounded-lg px-3 py-1.5 shadow-lg text-black focus:outline-none focus:ring-2 focus:ring-zinc-600"
+          className="text-sm border border-zinc-300 rounded-lg px-3 py-1.5 shadow-sm text-black focus:outline-none focus:ring-2 focus:ring-orange-400"
         >
           <option value="all">Todas as notas</option>
           {[5, 4, 3, 2, 1].map((n) => (
@@ -57,6 +59,7 @@ export function AvaliacoesTable({
             </option>
           ))}
         </select>
+
         {hasFilters && (
           <button
             onClick={() => {
@@ -74,7 +77,7 @@ export function AvaliacoesTable({
       <div className="bg-white shadow-md rounded-xl overflow-hidden">
         <table className="w-full text-sm">
           <thead>
-            <tr className="bg-[#ff8d0acf] border-b border-zinc-700">
+            <tr className="bg-[#ff8d0a]">
               <th className="text-left text-xs font-medium text-white px-4 py-3 w-12">
                 #
               </th>
@@ -92,7 +95,8 @@ export function AvaliacoesTable({
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-500/50">
+
+          <tbody className="divide-y divide-zinc-200">
             {data.length === 0 ? (
               <tr>
                 <td
@@ -103,26 +107,32 @@ export function AvaliacoesTable({
                 </td>
               </tr>
             ) : (
-              data.map((a) => (
+              data.map((a, index) => (
                 <tr
                   key={a.id}
-                  className="hover:bg-[#ff8d0a34] transition-colors"
+                  className={`transition-all duration-200 hover:bg-orange-50 hover:translate-x-[2px] ${
+                    index % 2 === 0 ? "bg-white" : "bg-orange-50/40"
+                  }`}
                 >
                   <td className="px-4 py-3 text-zinc-600">{a.id}</td>
+
                   <td className="px-4 py-3 text-black font-semibold">
                     {a.nomefilial}
                   </td>
+
                   <td className="px-4 py-3">
                     <NotaBadge nota={Number(a.nota)} />
                   </td>
-                  <td className="px-4 py-3 text-gray-500 max-w-xs">
+
+                  <td className="px-4 py-3 text-zinc-600 max-w-xs">
                     {a.comentario?.trim() ? (
                       <span className="line-clamp-2">{a.comentario}</span>
                     ) : (
-                      <span className="text-zinc-600">—</span>
+                      <span className="text-zinc-400">—</span>
                     )}
                   </td>
-                  <td className="px-4 py-3 text-zinc-500 text-xs">
+
+                  <td className="px-4 py-3 text-zinc-400 text-xs">
                     {a.data ? String(a.data).slice(0, 10) : "—"}
                   </td>
                 </tr>
@@ -138,21 +148,24 @@ export function AvaliacoesTable({
           <span className="text-xs text-zinc-500">
             {totalFiltered} resultado{totalFiltered !== 1 ? "s" : ""}
           </span>
+
           <div className="flex items-center gap-2">
             <button
               onClick={() => onPageChange(page - 1)}
               disabled={page === 1}
-              className="px-3 py-1.5 rounded-lg border border-zinc-700 text-zinc-400 text-xs disabled:opacity-30 hover:bg-zinc-700 transition-colors"
+              className="px-3 py-1.5 rounded-lg border border-zinc-300 text-zinc-600 text-xs disabled:opacity-30 hover:bg-zinc-100 transition-colors"
             >
               ← Anterior
             </button>
+
             <span className="text-xs text-zinc-500">
               {page} / {totalPages}
             </span>
+
             <button
               onClick={() => onPageChange(page + 1)}
               disabled={page === totalPages}
-              className="px-3 py-1.5 rounded-lg border border-zinc-700 text-zinc-400 text-xs disabled:opacity-30 hover:bg-zinc-700 transition-colors"
+              className="px-3 py-1.5 rounded-lg border border-zinc-300 text-zinc-600 text-xs disabled:opacity-30 hover:bg-zinc-100 transition-colors"
             >
               Próxima →
             </button>
