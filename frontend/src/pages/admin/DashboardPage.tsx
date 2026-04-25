@@ -51,13 +51,9 @@ export default function DashboardPage() {
         </p>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 ">
         <MetricCard label="Total de avaliações" value={metrics.total} />
-        <MetricCard
-          label="Nota média geral"
-          value={metrics.media}
-          sub="de 5.0"
-        />
+        <MetricCard label="Nota média" value={metrics.media} sub="de 5.0" />
         <MetricCard label="Notas máximas (5★)" value={`${metrics.pct5}%`} />
         <MetricCard
           label="Com comentário"
