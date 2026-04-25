@@ -27,6 +27,41 @@ export function AvaliacoesTable({
   onFilterNota,
   onPageChange,
 }: AvaliacoesTableProps) {
+  function exportarCSV() {
+    // 1. pega os dados que estão sendo exibidos na tabela
+    const dadosParaExportar =
+      selectedIds.length > 0
+        ? sortedData.filter((a) => selectedIds.includes(a.id))
+        : sortedData;
+
+    // 2. cabeçalho do CSV
+    const cabecalho = ["ID", "Loja", "Nota", "Comentário", "Data"];
+
+    // 3. monta as linhas
+    const linhas = dadosParaExportar.map((a) => [
+      a.id,
+      a.nomefilial,
+      a.nota,
+      a.comentario?.replace(/,/g, " "), // evita quebrar CSV
+      a.data ? String(a.data).slice(0, 10) : "",
+    ]);
+
+    // 4. junta tudo em texto CSV
+    const csvContent = [cabecalho, ...linhas]
+      .map((e) => e.join(","))
+      .join("\n");
+
+    // 5. cria arquivo para download
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", "avaliacoes.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
   const hasFilters = filterLoja !== "all" || filterNota !== "all";
 
   // 🔥 Ordenação
@@ -133,6 +168,23 @@ export function AvaliacoesTable({
             Limpar filtros
           </button>
         )}
+        <button
+          onClick={exportarCSV}
+          className="
+    flex items-center gap-2
+    text-xs font-medium
+    px-3 py-1.5
+    bg-green-600 text-white
+    rounded-lg
+    shadow-sm
+    hover:bg-green-700
+    hover:shadow-md
+    active:scale-95
+    transition-all duration-200
+  "
+        >
+          📥 Exportar CSV
+        </button>
       </div>
 
       {/* Tabela */}
