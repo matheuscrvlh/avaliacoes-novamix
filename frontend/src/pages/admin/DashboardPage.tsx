@@ -42,13 +42,24 @@ export default function DashboardPage() {
   return (
     <div className="p-6 space-y-6 max-w-6xl mx-auto shadow-lg bg-[#f5f5f5]">
       {/* Header */}
-      <div>
-        <h1 className="text-xl font-semibold text-[#EA8006]">
-          AVALIAÇÕES DAS LOJAS
-        </h1>
-        <p className="text-sm text-zinc-500 mt-0.5 und">
-          {metrics.total} avaliações no total
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-zinc-800 flex items-center gap-2">
+            Avaliações das Lojas
+            <span className="text-xs bg-orange-500 text-white px-2 py-0.5 rounded-full">
+              Dashboard
+            </span>
+          </h1>
+
+          <p className="text-sm text-zinc-500 mt-1">
+            Acompanhe as avaliações e desempenho das filiais
+          </p>
+        </div>
+
+        <div className="text-right">
+          <p className="text-2xl font-bold text-orange-500">{metrics.total}</p>
+          <p className="text-xs text-zinc-500">avaliações</p>
+        </div>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 ">
