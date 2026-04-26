@@ -22,7 +22,7 @@ export function Footer() {
         </a>
 
         <a
-          href="https://github.com/matheuscrvlh"
+          href="https://www.mthcode.com.br"
           target="_blank"
           rel="noreferrer"
           className="flex items-center gap-1 hover:text-orange-500 transition"
