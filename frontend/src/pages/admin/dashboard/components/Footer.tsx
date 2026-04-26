@@ -1,9 +1,7 @@
 export function Footer() {
   return (
-    <footer className="mt-10 border-t border-zinc-200 pt-4 flex flex-col md:flex-row items-center justify-between text-sm text-zinc-500">
-      <p>© {new Date().getFullYear()} NovaMix</p>
-
-      <div className="flex items-center gap-4 mt-2 md:mt-0">
+    <footer className="mt-10 border-t border-zinc-200 pt-4 flex flex-col items-center justify-center text-sm text-zinc-500">
+      <div className="flex items-center justify-center gap-4">
         <a
           href="https://github.com/marlonalvees"
           target="_blank"
