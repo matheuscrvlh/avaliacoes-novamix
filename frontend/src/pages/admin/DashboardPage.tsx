@@ -1,8 +1,11 @@
+// Components
 import { useDashboard } from "../../pages/admin/dashboard/hooks/useDashBoard";
 import { MetricCard } from "../../pages/admin/dashboard/components/MetricCard";
 import { LojaCard } from "../../pages/admin/dashboard/components/LojaCard";
 import { DistribuicaoBar } from "../../pages/admin/dashboard/components/DistribuicaoBar";
 import { AvaliacoesTable } from "../../pages/admin/dashboard/components/AvaliacoesTable";
+import { Footer } from "../admin/dashboard/components/Footer";
+//
 import { motion } from "framer-motion";
 import { Store, ChevronRight } from "lucide-react";
 
@@ -43,14 +46,13 @@ export default function DashboardPage() {
 
   return (
     <div className="p-6 space-y-6 max-w-6xl mx-auto bg-[#f5f5f5]">
-      {/* HEADER */}
+      {/* header */}
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
         className="space-y-3"
       >
-        {/* Breadcrumb */}
         <div className="flex items-center text-xs text-zinc-400 gap-1">
           <span>Dashboard</span>
           <ChevronRight size={14} />
@@ -79,7 +81,7 @@ export default function DashboardPage() {
         </div>
       </motion.div>
 
-      {/* MÉTRICAS */}
+      {/* metricas */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <MetricCard label="Total de avaliações" value={metrics?.total || 0} />
         <MetricCard
@@ -98,7 +100,7 @@ export default function DashboardPage() {
         />
       </div>
 
-      {/* CARDS DAS LOJAS */}
+      {/* cards lojas */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {(lojas || []).map(([id, nome]) => (
           <LojaCard
@@ -110,12 +112,12 @@ export default function DashboardPage() {
         ))}
       </div>
 
-      {/* GRÁFICO */}
+      {/* graficos */}
       <div className="bg-white p-4 rounded-xl shadow-sm border border-zinc-200">
         <DistribuicaoBar data={distribuicao || []} />
       </div>
 
-      {/* TABELA */}
+      {/* tabela */}
       <div className="bg-white p-4 rounded-xl shadow-sm border border-zinc-200">
         <AvaliacoesTable
           data={pageData || []}
@@ -130,6 +132,7 @@ export default function DashboardPage() {
           onPageChange={handlePageChange}
         />
       </div>
+      <Footer />
     </div>
   );
 }
