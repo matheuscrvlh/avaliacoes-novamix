@@ -2,6 +2,7 @@ export function Footer() {
   return (
     <footer className="mt-10 border-t border-zinc-200 pt-4 flex flex-col items-center justify-center text-sm text-zinc-500">
       <div className="flex items-center justify-center gap-4">
+        <p>Desenvolvido por:</p>
         <a
           href="https://github.com/marlonalvees"
           target="_blank"
