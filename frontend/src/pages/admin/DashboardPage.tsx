@@ -1,4 +1,3 @@
-// Components
 import { useDashboard } from "../../pages/admin/dashboard/hooks/useDashBoard";
 import { MetricCard } from "../../pages/admin/dashboard/components/MetricCard";
 import { LojaCard } from "../../pages/admin/dashboard/components/LojaCard";
@@ -7,9 +6,14 @@ import { AvaliacoesTable } from "../../pages/admin/dashboard/components/Avaliaco
 import { Footer } from "../admin/dashboard/components/Footer";
 //
 import { motion } from "framer-motion";
-import { Store, ChevronRight } from "lucide-react";
+import { Store, ChevronRight, LogOut } from "lucide-react";
+import { useAuth } from "../../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 export default function DashboardPage() {
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+
   const {
     avaliacoes,
     loading,
@@ -27,6 +31,11 @@ export default function DashboardPage() {
     handleFilterNota,
     handlePageChange,
   } = useDashboard();
+
+  function handleLogout() {
+    logout();
+    navigate("/login");
+  }
 
   if (loading) {
     return (
@@ -66,17 +75,27 @@ export default function DashboardPage() {
               <Store className="text-orange-500" size={22} />
               Avaliações das Lojas
             </h1>
-
             <p className="text-sm text-zinc-500 mt-1">
               Acompanhe as avaliações e desempenho das filiais
             </p>
           </div>
 
-          <div className="text-right">
-            <p className="text-2xl font-bold text-orange-500">
-              {metrics?.total || 0}
-            </p>
-            <p className="text-xs text-zinc-500">avaliações</p>
+          <div className="flex items-center gap-4">
+            <div className="text-right">
+              <p className="text-2xl font-bold text-orange-500">
+                {metrics?.total || 0}
+              </p>
+              <p className="text-xs text-zinc-500">avaliações</p>
+            </div>
+
+            {/* button 'sair' */}
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-2 text-xs font-medium px-3 py-2 rounded-lg border border-zinc-200 text-zinc-500 hover:bg-red-50 hover:text-red-500 hover:border-red-200 transition-colors"
+            >
+              <LogOut size={14} />
+              Sair
+            </button>
           </div>
         </div>
       </motion.div>

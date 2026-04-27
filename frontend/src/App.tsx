@@ -1,16 +1,33 @@
-// REACT
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from "react-router-dom";
 
+import { AuthProvider } from "./context/AuthContext";
 
-// PAGES
+// components
+import { PrivateRoute } from "./components/auth/PrivateRoute";
+
+// pages
 import AvaliacaoPage from "@/pages/public/AvaliacaoPage";
 import DashboardPage from "@/pages/admin/DashboardPage";
+import LoginPage from "@/pages/LoginPage";
 
 export default function App() {
   return (
-    <Routes>
-      <Route path='/' element={<AvaliacaoPage />} />
-      <Route path='/dashboard' element={<DashboardPage />} />
-    </Routes>
+    <AuthProvider>
+      <Routes>
+        <Route path="/" element={<AvaliacaoPage />} />
+        <Route path="/login" element={<LoginPage />} />
+
+        <Route
+          path="/dashboard"
+          element={
+            <PrivateRoute>
+              <DashboardPage />
+            </PrivateRoute>
+          }
+        />
+
+        <Route path="*" element={<Navigate to="/login" replace />} />
+      </Routes>
+    </AuthProvider>
   );
 }
