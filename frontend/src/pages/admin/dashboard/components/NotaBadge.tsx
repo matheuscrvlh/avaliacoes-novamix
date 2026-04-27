@@ -1,4 +1,4 @@
-import { NOTA_COLORS } from "../constants";
+import { NOTA_COLORS } from "../../constants";
 
 interface NotaBadgeProps {
   nota: number;

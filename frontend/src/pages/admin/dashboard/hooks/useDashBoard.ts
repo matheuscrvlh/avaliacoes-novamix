@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { getAvaliacoes } from "../../../../lib/api";
 import { Avaliacao } from "../types/avaliacao";
-import { PER_PAGE } from "../constants";
+import { PER_PAGE } from "../../constants";
 
 export function useDashboard() {
   const [avaliacoes, setAvaliacoes] = useState<Avaliacao[]>([]);
@@ -27,7 +27,7 @@ export function useDashboard() {
           data: a.data,
         }));
 
-        console.log(dadosFormatados)
+        console.log(dadosFormatados);
 
         setAvaliacoes(dadosFormatados);
       } catch {

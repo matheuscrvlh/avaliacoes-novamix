@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { BAR_COLORS } from "../constants";
+import { BAR_COLORS } from "../../constants";
 
 interface DistribuicaoBarProps {
   data: { nota: number; count: number }[];

@@ -6,6 +6,7 @@ import LojaInvalida from "@/components/ui/LojaInvalida";
 
 export default function AvaliacaoPage() {
   const loja = useLojaParam();
+
   const {
     nota,
     setNota,
@@ -22,10 +23,11 @@ export default function AvaliacaoPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-novamix-berylline p-4">
       {status === "success" ? (
-        <AvaliacaoSucesso onReset={reset} />
+        <AvaliacaoSucesso onReset={reset} nota={nota} lojaId={loja.id} />
       ) : (
         <AvaliacaoForm
           nomeLoja={loja.nome}
+          lojaId={loja.id}
           nota={nota}
           onNotaChange={setNota}
           comentario={comentario}
