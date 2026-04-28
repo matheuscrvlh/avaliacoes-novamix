@@ -15,6 +15,15 @@ interface AvaliacoesTableProps {
   onPageChange: (page: number) => void;
 }
 
+function formatarDataHora(valor: string | null | undefined) {
+  if (!valor) return { data: "—", hora: "—" };
+  const str = String(valor);
+  const [datePart, timePart] = str.split(" ");
+  const [ano, mes, dia] = datePart.split("-");
+  const hora = timePart ? timePart.slice(0, 5) : "—";
+  return { data: `${dia}/${mes}/${ano}`, hora };
+}
+
 export function AvaliacoesTable({
   data,
   totalFiltered,
@@ -29,7 +38,6 @@ export function AvaliacoesTable({
 }: AvaliacoesTableProps) {
   const hasFilters = filterLoja !== "all" || filterNota !== "all";
 
-  // Ordenação
   const [sortField, setSortField] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
@@ -75,14 +83,18 @@ export function AvaliacoesTable({
         ? sortedData.filter((a) => selectedIds.includes(a.id))
         : sortedData;
 
-    const cabecalho = ["ID", "Loja", "Nota", "Comentário", "Data"];
-    const linhas = dadosParaExportar.map((a) => [
-      a.id,
-      a.nomefilial,
-      a.nota,
-      a.comentario?.replace(/,/g, " "),
-      a.data ? String(a.data).slice(0, 10) : "",
-    ]);
+    const cabecalho = ["ID", "Loja", "Nota", "Comentário", "Data", "Hora"];
+    const linhas = dadosParaExportar.map((a) => {
+      const { data: d, hora: h } = formatarDataHora(a.data);
+      return [
+        a.id,
+        a.nomefilial,
+        a.nota,
+        a.comentario?.replace(/,/g, " "),
+        d,
+        h,
+      ];
+    });
 
     const csvContent = [cabecalho, ...linhas]
       .map((e) => e.join(","))
@@ -100,7 +112,6 @@ export function AvaliacoesTable({
 
   return (
     <div>
-      {/* Ações em lote */}
       {selectedIds.length > 0 && (
         <div className="mb-3 flex items-center justify-between bg-orange-50 border border-orange-200 rounded-lg px-4 py-2">
           <span className="text-sm text-orange-700">
@@ -163,60 +174,64 @@ export function AvaliacoesTable({
         </button>
       </div>
 
-      {/* card mobile */}
+      {/* Cards mobile */}
       <div className="flex flex-col gap-3 sm:hidden">
         {sortedData.length === 0 ? (
           <p className="text-center py-10 text-zinc-500 text-sm">
             Nenhuma avaliação encontrada.
           </p>
         ) : (
-          sortedData.map((a) => (
-            <div
-              key={a.id}
-              onClick={() => toggleSelect(a.id)}
-              className={`
-                border rounded-xl p-4 flex flex-col gap-2 cursor-pointer transition-colors
-                ${
-                  selectedIds.includes(a.id)
-                    ? "bg-orange-50 border-orange-300"
-                    : "bg-white border-zinc-200"
-                }
-              `}
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    checked={selectedIds.includes(a.id)}
-                    onChange={() => toggleSelect(a.id)}
-                    onClick={(e) => e.stopPropagation()}
-                    className="accent-orange-500"
-                  />
-                  <span className="font-semibold text-sm text-black">
-                    {a.nomefilial}
-                  </span>
+          sortedData.map((a) => {
+            const { data: d, hora: h } = formatarDataHora(a.data);
+            return (
+              <div
+                key={a.id}
+                onClick={() => toggleSelect(a.id)}
+                className={`
+                  border rounded-xl p-4 flex flex-col gap-2 cursor-pointer transition-colors
+                  ${
+                    selectedIds.includes(a.id)
+                      ? "bg-orange-50 border-orange-300"
+                      : "bg-white border-zinc-200"
+                  }
+                `}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={selectedIds.includes(a.id)}
+                      onChange={() => toggleSelect(a.id)}
+                      onClick={(e) => e.stopPropagation()}
+                      className="accent-orange-500"
+                    />
+                    <span className="font-semibold text-sm text-black">
+                      {a.nomefilial}
+                    </span>
+                  </div>
+                  <span className="text-xs text-zinc-400">#{a.id}</span>
                 </div>
-                <span className="text-xs text-zinc-400">#{a.id}</span>
-              </div>
 
-              <div className="flex items-center justify-between">
-                <NotaBadge nota={Number(a.nota)} />
-                <span className="text-xs text-zinc-400">
-                  {a.data ? String(a.data).slice(0, 10) : "—"}
-                </span>
-              </div>
+                <div className="flex items-center justify-between">
+                  <NotaBadge nota={Number(a.nota)} />
+                  <div className="text-right">
+                    <p className="text-xs text-zinc-400">{d}</p>
+                    <p className="text-xs text-zinc-400">{h}</p>
+                  </div>
+                </div>
 
-              {a.comentario?.trim() && (
-                <p className="text-sm text-zinc-600 border-t border-zinc-100 pt-2">
-                  {a.comentario}
-                </p>
-              )}
-            </div>
-          ))
+                {a.comentario?.trim() && (
+                  <p className="text-sm text-zinc-600 border-t border-zinc-100 pt-2">
+                    {a.comentario}
+                  </p>
+                )}
+              </div>
+            );
+          })
         )}
       </div>
 
-      {/* tabela desk */}
+      {/* Tabela desktop */}
       <div className="hidden sm:block bg-white shadow-md rounded-xl overflow-hidden">
         <table className="w-full text-sm border-collapse">
           <thead className="sticky top-0 z-10">
@@ -257,60 +272,65 @@ export function AvaliacoesTable({
                 Data{" "}
                 {sortField === "data" && (sortDirection === "asc" ? "↑" : "↓")}
               </th>
+              <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-white/90 text-left">
+                Hora
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-zinc-200">
             {sortedData.length === 0 ? (
               <tr>
                 <td
-                  colSpan={6}
+                  colSpan={7}
                   className="text-center py-10 text-zinc-500 text-sm"
                 >
                   Nenhuma avaliação encontrada.
                 </td>
               </tr>
             ) : (
-              sortedData.map((a, index) => (
-                <tr
-                  key={a.id}
-                  className={`
-                    transition-all duration-200 hover:bg-orange-50
-                    ${selectedIds.includes(a.id) ? "bg-orange-100" : ""}
-                    ${index % 2 === 0 ? "bg-white" : "bg-orange-50/40"}
-                  `}
-                >
-                  <td className="px-4 py-3">
-                    <input
-                      type="checkbox"
-                      checked={selectedIds.includes(a.id)}
-                      onChange={() => toggleSelect(a.id)}
-                    />
-                  </td>
-                  <td className="px-4 py-3 text-zinc-600">{a.id}</td>
-                  <td className="px-4 py-3 font-semibold text-black">
-                    {a.nomefilial}
-                  </td>
-                  <td className="px-4 py-3">
-                    <NotaBadge nota={Number(a.nota)} />
-                  </td>
-                  <td className="px-4 py-3 text-zinc-600 max-w-xs">
-                    {a.comentario?.trim() ? (
-                      <span className="line-clamp-2">{a.comentario}</span>
-                    ) : (
-                      <span className="text-zinc-400">—</span>
-                    )}
-                  </td>
-                  <td className="px-4 py-3 text-zinc-400 text-xs">
-                    {a.data ? String(a.data).slice(0, 10) : "—"}
-                  </td>
-                </tr>
-              ))
+              sortedData.map((a, index) => {
+                const { data: d, hora: h } = formatarDataHora(a.data);
+                return (
+                  <tr
+                    key={a.id}
+                    className={`
+                      transition-all duration-200 hover:bg-orange-50
+                      ${selectedIds.includes(a.id) ? "bg-orange-100" : ""}
+                      ${index % 2 === 0 ? "bg-white" : "bg-orange-50/40"}
+                    `}
+                  >
+                    <td className="px-4 py-3">
+                      <input
+                        type="checkbox"
+                        checked={selectedIds.includes(a.id)}
+                        onChange={() => toggleSelect(a.id)}
+                      />
+                    </td>
+                    <td className="px-4 py-3 text-zinc-600">{a.id}</td>
+                    <td className="px-4 py-3 font-semibold text-black">
+                      {a.nomefilial}
+                    </td>
+                    <td className="px-4 py-3">
+                      <NotaBadge nota={Number(a.nota)} />
+                    </td>
+                    <td className="px-4 py-3 text-zinc-600 max-w-xs">
+                      {a.comentario?.trim() ? (
+                        <span className="line-clamp-2">{a.comentario}</span>
+                      ) : (
+                        <span className="text-zinc-400">—</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-zinc-400 text-xs">{d}</td>
+                    <td className="px-4 py-3 text-zinc-400 text-xs">{h}</td>
+                  </tr>
+                );
+              })
             )}
           </tbody>
         </table>
       </div>
 
-      {/* paginacao */}
+      {/* Paginação */}
       {totalPages > 1 && (
         <div className="flex items-center justify-between mt-3">
           <span className="text-xs text-zinc-500">
