@@ -14,7 +14,7 @@ app.use("/avaliacoes", avaliacoes);
 app.use("/dashboard", dashboard);
 app.use("/auth", auth);
 
-const PORT = 3002;
+const PORT = 3000;
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);
 });
