@@ -27,6 +27,8 @@ export default function DashboardPage() {
     filterNota,
     page,
     totalPages,
+    itemsPerPage,
+    handleItemsPerPageChange,
     handleFilterLoja,
     handleFilterNota,
     handlePageChange,
@@ -146,6 +148,8 @@ export default function DashboardPage() {
           filterNota={filterNota}
           page={page}
           totalPages={totalPages}
+          itemsPerPage={itemsPerPage}
+          onItemsPerPageChange={handleItemsPerPageChange}
           onFilterLoja={handleFilterLoja}
           onFilterNota={handleFilterNota}
           onPageChange={handlePageChange}

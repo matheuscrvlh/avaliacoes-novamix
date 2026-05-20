@@ -10,6 +10,8 @@ interface AvaliacoesTableProps {
   filterNota: string;
   page: number;
   totalPages: number;
+  itemsPerPage: number;
+  onItemsPerPageChange: (value: number) => void;
   onFilterLoja: (val: string) => void;
   onFilterNota: (val: string) => void;
   onPageChange: (page: number) => void;
@@ -32,6 +34,8 @@ export function AvaliacoesTable({
   filterNota,
   page,
   totalPages,
+  itemsPerPage,
+  onItemsPerPageChange,
   onFilterLoja,
   onFilterNota,
   onPageChange,
@@ -166,6 +170,17 @@ export function AvaliacoesTable({
             Limpar filtros
           </button>
         )}
+
+        <select
+          value={itemsPerPage}
+          onChange={(e) => onItemsPerPageChange(Number(e.target.value))}
+          className="text-sm border border-zinc-300 rounded-lg px-3 py-1.5 shadow-sm text-black focus:outline-none focus:ring-2 focus:ring-orange-400"
+        >
+          <option value={10}>10 por página</option>
+          <option value={50}>50 por página</option>
+          <option value={100}>100 por página</option>
+        </select>
+
         <button
           onClick={exportarCSV}
           className="flex items-center gap-2 text-xs font-medium px-3 py-1.5 bg-green-600 text-white rounded-lg shadow-sm hover:bg-green-700 hover:shadow-md active:scale-95 transition-all duration-200"

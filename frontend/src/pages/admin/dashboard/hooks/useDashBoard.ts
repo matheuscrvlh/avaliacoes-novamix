@@ -1,7 +1,6 @@
 import { useEffect, useState, useMemo } from "react";
 import { getAvaliacoes } from "../../../../lib/api";
 import { Avaliacao } from "../types/avaliacao";
-import { PER_PAGE } from "../../constants";
 
 export function useDashboard() {
   const [avaliacoes, setAvaliacoes] = useState<Avaliacao[]>([]);
@@ -10,6 +9,7 @@ export function useDashboard() {
   const [filterLoja, setFilterLoja] = useState("all");
   const [filterNota, setFilterNota] = useState("all");
   const [page, setPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   useEffect(() => {
     async function fetchAvaliacoes() {
@@ -79,8 +79,11 @@ export function useDashboard() {
     [avaliacoes, filterLoja, filterNota],
   );
 
-  const totalPages = Math.ceil(filteredData.length / PER_PAGE);
-  const pageData = filteredData.slice((page - 1) * PER_PAGE, page * PER_PAGE);
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  const pageData = filteredData.slice(
+    (page - 1) * itemsPerPage,
+    page * itemsPerPage,
+  );
 
   function handleFilterLoja(val: string) {
     setFilterLoja(val);
@@ -92,6 +95,11 @@ export function useDashboard() {
   }
   function handlePageChange(p: number) {
     setPage(Math.min(Math.max(1, p), totalPages));
+  }
+
+  function handleItemsPerPageChange(value: number) {
+    setItemsPerPage(value);
+    setPage(1);
   }
 
   return {
@@ -107,6 +115,9 @@ export function useDashboard() {
     filterNota,
     page,
     totalPages,
+    itemsPerPage,
+    setItemsPerPage,
+    handleItemsPerPageChange,
     handleFilterLoja,
     handleFilterNota,
     handlePageChange,
