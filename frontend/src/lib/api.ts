@@ -23,7 +23,7 @@ export async function getAvaliacoes() {
     })
     
     const res = await response.json()
-    console.log(res)
+
     return res
   } catch(err) {
     console.error('Erro ao buscar avaliacoes', err)

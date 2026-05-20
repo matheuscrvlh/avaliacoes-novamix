@@ -11,10 +11,12 @@ router.post('/loja/:lojaId', (req, res) => {
     return res.status(400).json({ erro: 'Loja e nota são obrigatórios' })
   }
 
+  const data = new Date().toISOString()
+
   const stmt = db.prepare(
-    'INSERT INTO avaliacoes (idfilial, nomefilial, nota, comentario) VALUES (?, ?, ?, ?)'
+    'INSERT INTO avaliacoes (idfilial, nomefilial, nota, comentario, data) VALUES (?, ?, ?, ?, ?)'
   )
-  stmt.run(lojaId, nomeLoja, nota, comentario || null)
+  stmt.run(lojaId, nomeLoja, nota, comentario || null, data)
 
   res.json({ sucesso: true })
 })
