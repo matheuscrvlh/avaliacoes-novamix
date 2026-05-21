@@ -27,8 +27,6 @@ export function useDashboard() {
           data: a.data,
         }));
 
-        console.log(dadosFormatados);
-
         setAvaliacoes(dadosFormatados);
       } catch {
         setError("Não foi possível carregar as avaliações.");

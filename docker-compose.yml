@@ -1,8 +1,12 @@
 services:
   backend:
     build: ./backend
+    env_file:
+      - ./backend/.env
     container_name: avaliacoes-backend
     restart: always
+    ports: 
+      - "3002:3000"
     volumes:
       - ./backend/database:/app/database  # persiste o SQLite
 
@@ -11,6 +15,6 @@ services:
     container_name: avaliacoes-frontend
     restart: always
     ports:
-      - "8081:80"
+      - "8082:80"
     depends_on:
       - backend
