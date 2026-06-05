@@ -17,7 +17,7 @@ export function LojaCard({ nome, idfilial, avaliacoes }: LojaCardProps) {
     <div
       className="
         relative overflow-hidden
-        bg-white/80 backdrop-blur-md
+        bg-white/80 dark:bg-zinc-800/80 backdrop-blur-md
         rounded-xl p-5 flex flex-col gap-3 shadow-md
 
         transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]
@@ -36,7 +36,7 @@ export function LojaCard({ nome, idfilial, avaliacoes }: LojaCardProps) {
       "
     >
       <div className="flex items-center justify-between">
-        <span className="text-sm font-medium text-black">{nome}</span>
+        <span className="text-sm font-medium text-black dark:text-zinc-100">{nome}</span>
 
         <span className="text-xs text-white bg-[#ee9229] px-2 py-0.5 rounded-full">
           Filial {idfilial}
@@ -45,15 +45,15 @@ export function LojaCard({ nome, idfilial, avaliacoes }: LojaCardProps) {
 
       <Stars nota={Math.round(media)} />
 
-      <div className="grid grid-cols-2 gap-2 pt-1 border-t border-zinc-700">
+      <div className="grid grid-cols-2 gap-2 pt-1 border-t border-zinc-200 dark:border-zinc-700">
         <div>
-          <p className="text-xs text-zinc-500">Média</p>
-          <p className="text-lg font-semibold text-black">{media.toFixed(1)}</p>
+          <p className="text-xs text-zinc-500 dark:text-zinc-400">Média</p>
+          <p className="text-lg font-semibold text-black dark:text-zinc-100">{media.toFixed(1)}</p>
         </div>
 
         <div>
-          <p className="text-xs text-zinc-500">Avaliações</p>
-          <p className="text-lg font-semibold text-black">{notas.length}</p>
+          <p className="text-xs text-zinc-500 dark:text-zinc-400">Avaliações</p>
+          <p className="text-lg font-semibold text-black dark:text-zinc-100">{notas.length}</p>
         </div>
       </div>
     </div>

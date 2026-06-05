@@ -128,8 +128,8 @@ export function AvaliacoesTable({
   return (
     <div>
       {selectedIds.length > 0 && (
-        <div className="mb-3 flex items-center justify-between bg-orange-50 border border-orange-200 rounded-lg px-4 py-2">
-          <span className="text-sm text-orange-700">
+        <div className="mb-3 flex items-center justify-between bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg px-4 py-2">
+          <span className="text-sm text-orange-700 dark:text-orange-400">
             {selectedIds.length} selecionado(s)
           </span>
           <div className="flex gap-2">
@@ -145,12 +145,12 @@ export function AvaliacoesTable({
 
       {/* Filtros */}
       <div className="flex flex-wrap items-center gap-3 mb-3">
-        <span className="text-sm text-zinc-500">Filtrar por:</span>
+        <span className="text-sm text-zinc-500 dark:text-zinc-400">Filtrar por:</span>
         {showLojaFilter && (
           <select
             value={filterLoja}
             onChange={(e) => onFilterLoja(e.target.value)}
-            className="text-sm border border-zinc-300 rounded-lg px-3 py-1.5 shadow-sm text-black focus:outline-none focus:ring-2 focus:ring-orange-400"
+            className="text-sm border border-zinc-300 dark:border-zinc-600 rounded-lg px-3 py-1.5 shadow-sm text-black dark:text-zinc-100 bg-white dark:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-orange-400"
           >
             <option value="all">Todas as lojas</option>
             {lojas.map(([id, nome]) => (
@@ -163,7 +163,7 @@ export function AvaliacoesTable({
         <select
           value={filterNota}
           onChange={(e) => onFilterNota(e.target.value)}
-          className="text-sm border border-zinc-300 rounded-lg px-3 py-1.5 shadow-sm text-black focus:outline-none focus:ring-2 focus:ring-orange-400"
+          className="text-sm border border-zinc-300 dark:border-zinc-600 rounded-lg px-3 py-1.5 shadow-sm text-black dark:text-zinc-100 bg-white dark:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-orange-400"
         >
           <option value="all">Todas as notas</option>
           {[5, 4, 3, 2, 1].map((n) => (
@@ -178,7 +178,7 @@ export function AvaliacoesTable({
               onFilterLoja("all");
               onFilterNota("all");
             }}
-            className="text-xs text-zinc-500 hover:text-black underline"
+            className="text-xs text-zinc-500 dark:text-zinc-400 hover:text-black dark:hover:text-zinc-100 underline"
           >
             Limpar filtros
           </button>
@@ -187,7 +187,7 @@ export function AvaliacoesTable({
         <select
           value={itemsPerPage}
           onChange={(e) => onItemsPerPageChange(Number(e.target.value))}
-          className="text-sm border border-zinc-300 rounded-lg px-3 py-1.5 shadow-sm text-black focus:outline-none focus:ring-2 focus:ring-orange-400"
+          className="text-sm border border-zinc-300 dark:border-zinc-600 rounded-lg px-3 py-1.5 shadow-sm text-black dark:text-zinc-100 bg-white dark:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-orange-400"
         >
           <option value={10}>10 por página</option>
           <option value={50}>50 por página</option>
@@ -205,7 +205,7 @@ export function AvaliacoesTable({
       {/* Cards mobile */}
       <div className="flex flex-col gap-3 sm:hidden">
         {sortedData.length === 0 ? (
-          <p className="text-center py-10 text-zinc-500 text-sm">
+          <p className="text-center py-10 text-zinc-500 dark:text-zinc-400 text-sm">
             Nenhuma avaliação encontrada.
           </p>
         ) : (
@@ -219,8 +219,8 @@ export function AvaliacoesTable({
                   border rounded-xl p-4 flex flex-col gap-2 cursor-pointer transition-colors
                   ${
                     selectedIds.includes(a.id)
-                      ? "bg-orange-50 border-orange-300"
-                      : "bg-white border-zinc-200"
+                      ? "bg-orange-50 dark:bg-orange-900/20 border-orange-300 dark:border-orange-700"
+                      : "bg-white dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700"
                   }
                 `}
               >
@@ -233,23 +233,23 @@ export function AvaliacoesTable({
                       onClick={(e) => e.stopPropagation()}
                       className="accent-orange-500"
                     />
-                    <span className="font-semibold text-sm text-black">
+                    <span className="font-semibold text-sm text-black dark:text-zinc-100">
                       {a.nomefilial}
                     </span>
                   </div>
-                  <span className="text-xs text-zinc-400">#{a.id}</span>
+                  <span className="text-xs text-zinc-400 dark:text-zinc-500">#{a.id}</span>
                 </div>
 
                 <div className="flex items-center justify-between">
                   <NotaBadge nota={Number(a.nota)} />
                   <div className="text-right">
-                    <p className="text-xs text-zinc-400">{d}</p>
-                    <p className="text-xs text-zinc-400">{h}</p>
+                    <p className="text-xs text-zinc-400 dark:text-zinc-500">{d}</p>
+                    <p className="text-xs text-zinc-400 dark:text-zinc-500">{h}</p>
                   </div>
                 </div>
 
                 {a.comentario?.trim() && (
-                  <p className="text-sm text-zinc-600 border-t border-zinc-100 pt-2">
+                  <p className="text-sm text-zinc-600 dark:text-zinc-400 border-t border-zinc-100 dark:border-zinc-700 pt-2">
                     {a.comentario}
                   </p>
                 )}
@@ -260,7 +260,7 @@ export function AvaliacoesTable({
       </div>
 
       {/* Tabela desktop */}
-      <div className="hidden sm:block bg-white shadow-md rounded-xl overflow-hidden">
+      <div className="hidden sm:block bg-white dark:bg-zinc-800 shadow-md rounded-xl overflow-hidden">
         <table className="w-full text-sm border-collapse">
           <thead className="sticky top-0 z-10">
             <tr className="bg-gradient-to-r from-orange-500 to-orange-400">
@@ -305,12 +305,12 @@ export function AvaliacoesTable({
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-zinc-200">
+          <tbody className="divide-y divide-zinc-200 dark:divide-zinc-700">
             {sortedData.length === 0 ? (
               <tr>
                 <td
                   colSpan={7}
-                  className="text-center py-10 text-zinc-500 text-sm"
+                  className="text-center py-10 text-zinc-500 dark:text-zinc-400 text-sm"
                 >
                   Nenhuma avaliação encontrada.
                 </td>
@@ -322,9 +322,9 @@ export function AvaliacoesTable({
                   <tr
                     key={a.id}
                     className={`
-                      transition-all duration-200 hover:bg-orange-50
-                      ${selectedIds.includes(a.id) ? "bg-orange-100" : ""}
-                      ${index % 2 === 0 ? "bg-white" : "bg-orange-50/40"}
+                      transition-all duration-200 hover:bg-orange-50 dark:hover:bg-zinc-700
+                      ${selectedIds.includes(a.id) ? "bg-orange-100 dark:bg-orange-900/30" : ""}
+                      ${index % 2 === 0 ? "bg-white dark:bg-zinc-800" : "bg-orange-50/40 dark:bg-zinc-700/40"}
                     `}
                   >
                     <td className="px-4 py-3">
@@ -334,22 +334,22 @@ export function AvaliacoesTable({
                         onChange={() => toggleSelect(a.id)}
                       />
                     </td>
-                    <td className="px-4 py-3 text-zinc-600">{a.id}</td>
-                    <td className="px-4 py-3 font-semibold text-black">
+                    <td className="px-4 py-3 text-zinc-600 dark:text-zinc-400">{a.id}</td>
+                    <td className="px-4 py-3 font-semibold text-black dark:text-zinc-100">
                       {a.nomefilial}
                     </td>
                     <td className="px-4 py-3">
                       <NotaBadge nota={Number(a.nota)} />
                     </td>
-                    <td className="px-4 py-3 text-zinc-600 max-w-xs">
+                    <td className="px-4 py-3 text-zinc-600 dark:text-zinc-400 max-w-xs">
                       {a.comentario?.trim() ? (
                         <span className="line-clamp-2">{a.comentario}</span>
                       ) : (
-                        <span className="text-zinc-400">—</span>
+                        <span className="text-zinc-400 dark:text-zinc-600">—</span>
                       )}
                     </td>
-                    <td className="px-4 py-3 text-zinc-400 text-xs">{d}</td>
-                    <td className="px-4 py-3 text-zinc-400 text-xs">{h}</td>
+                    <td className="px-4 py-3 text-zinc-400 dark:text-zinc-500 text-xs">{d}</td>
+                    <td className="px-4 py-3 text-zinc-400 dark:text-zinc-500 text-xs">{h}</td>
                   </tr>
                 );
               })
@@ -361,38 +361,38 @@ export function AvaliacoesTable({
       {/* Paginação */}
       {totalPages > 1 && (
         <div className="flex items-center justify-between mt-3">
-          <span className="text-xs text-zinc-500">
+          <span className="text-xs text-zinc-500 dark:text-zinc-400">
             {totalFiltered} resultado{totalFiltered !== 1 ? "s" : ""}
           </span>
           <div className="flex items-center gap-2">
             <button
               onClick={() => onPageChange(1)}
               disabled={page === 1}
-              className="px-3 py-1.5 rounded-lg border border-zinc-300 text-zinc-600 text-xs disabled:opacity-30 hover:bg-zinc-100 transition-colors"
+              className="px-3 py-1.5 rounded-lg border border-zinc-300 dark:border-zinc-600 text-zinc-600 dark:text-zinc-300 text-xs disabled:opacity-30 hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors"
             >
               «
             </button>
             <button
               onClick={() => onPageChange(page - 1)}
               disabled={page === 1}
-              className="px-3 py-1.5 rounded-lg border border-zinc-300 text-zinc-600 text-xs disabled:opacity-30 hover:bg-zinc-100 transition-colors"
+              className="px-3 py-1.5 rounded-lg border border-zinc-300 dark:border-zinc-600 text-zinc-600 dark:text-zinc-300 text-xs disabled:opacity-30 hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors"
             >
               ← Anterior
             </button>
-            <span className="text-xs text-zinc-500">
+            <span className="text-xs text-zinc-500 dark:text-zinc-400">
               {page} / {totalPages}
             </span>
             <button
               onClick={() => onPageChange(page + 1)}
               disabled={page === totalPages}
-              className="px-3 py-1.5 rounded-lg border border-zinc-300 text-zinc-600 text-xs disabled:opacity-30 hover:bg-zinc-100 transition-colors"
+              className="px-3 py-1.5 rounded-lg border border-zinc-300 dark:border-zinc-600 text-zinc-600 dark:text-zinc-300 text-xs disabled:opacity-30 hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors"
             >
               Próxima →
             </button>
             <button
               onClick={() => onPageChange(totalPages)}
               disabled={page === totalPages}
-              className="px-3 py-1.5 rounded-lg border border-zinc-300 text-zinc-600 text-xs disabled:opacity-30 hover:bg-zinc-100 transition-colors"
+              className="px-3 py-1.5 rounded-lg border border-zinc-300 dark:border-zinc-600 text-zinc-600 dark:text-zinc-300 text-xs disabled:opacity-30 hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors"
             >
               »
             </button>

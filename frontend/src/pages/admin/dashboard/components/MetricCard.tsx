@@ -9,7 +9,7 @@ export function MetricCard({ label, value, sub }: MetricCardProps) {
     <div
       className="
         relative overflow-hidden
-        bg-white/80 backdrop-blur-md
+        bg-white/80 dark:bg-zinc-800/80 backdrop-blur-md
         rounded-xl p-4 shadow-md
 
         transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]
@@ -27,11 +27,11 @@ export function MetricCard({ label, value, sub }: MetricCardProps) {
         hover:before:opacity-100
       "
     >
-      <p className="text-xs text-zinc-400 mb-1">{label}</p>
+      <p className="text-xs text-zinc-400 dark:text-zinc-500 mb-1">{label}</p>
 
-      <p className="text-2xl font-semibold text-black">{value}</p>
+      <p className="text-2xl font-semibold text-black dark:text-zinc-100">{value}</p>
 
-      {sub && <p className="text-xs text-zinc-500 mt-0.5">{sub}</p>}
+      {sub && <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">{sub}</p>}
     </div>
   );
 }

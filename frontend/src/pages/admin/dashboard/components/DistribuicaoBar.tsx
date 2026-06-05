@@ -16,15 +16,15 @@ export function DistribuicaoBar({ data }: DistribuicaoBarProps) {
 
   if (!data.length) {
     return (
-      <div className="bg-white shadow-md rounded-xl p-5 text-sm text-zinc-500">
+      <div className="bg-white dark:bg-zinc-800 shadow-md rounded-xl p-5 text-sm text-zinc-500 dark:text-zinc-400">
         Nenhuma avaliação disponível no momento.
       </div>
     );
   }
 
   return (
-    <div className="bg-white shadow-md rounded-xl p-5">
-      <p className="text-sm font-semibold text-zinc-800 mb-4">
+    <div className="bg-white dark:bg-zinc-800 shadow-md rounded-xl p-5">
+      <p className="text-sm font-semibold text-zinc-800 dark:text-zinc-100 mb-4">
         Distribuição de notas
       </p>
 
@@ -45,12 +45,12 @@ export function DistribuicaoBar({ data }: DistribuicaoBarProps) {
                 transitionDelay: `${index * 120}ms`,
               }}
             >
-              <span className="text-xs text-zinc-500 w-4 text-right">
+              <span className="text-xs text-zinc-500 dark:text-zinc-400 w-4 text-right">
                 {nota}
               </span>
 
               <div
-                className="flex-1 bg-zinc-200 rounded-full h-5 overflow-hidden relative group"
+                className="flex-1 bg-zinc-200 dark:bg-zinc-700 rounded-full h-5 overflow-hidden relative group"
                 title={`Nota ${nota}: ${count} avaliações (${Math.round(
                   percentage,
                 )}%)`}
@@ -62,12 +62,12 @@ export function DistribuicaoBar({ data }: DistribuicaoBarProps) {
                   }}
                 />
 
-                <div className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-zinc-600 opacity-0 group-hover:opacity-100 transition">
+                <div className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-zinc-600 dark:text-zinc-300 opacity-0 group-hover:opacity-100 transition">
                   {Math.round(percentage)}%
                 </div>
               </div>
 
-              <span className="text-xs text-zinc-500 w-8 text-right">
+              <span className="text-xs text-zinc-500 dark:text-zinc-400 w-8 text-right">
                 {count}
               </span>
             </div>
