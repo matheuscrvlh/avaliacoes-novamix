@@ -366,6 +366,13 @@ export function AvaliacoesTable({
           </span>
           <div className="flex items-center gap-2">
             <button
+              onClick={() => onPageChange(1)}
+              disabled={page === 1}
+              className="px-3 py-1.5 rounded-lg border border-zinc-300 text-zinc-600 text-xs disabled:opacity-30 hover:bg-zinc-100 transition-colors"
+            >
+              «
+            </button>
+            <button
               onClick={() => onPageChange(page - 1)}
               disabled={page === 1}
               className="px-3 py-1.5 rounded-lg border border-zinc-300 text-zinc-600 text-xs disabled:opacity-30 hover:bg-zinc-100 transition-colors"
@@ -381,6 +388,13 @@ export function AvaliacoesTable({
               className="px-3 py-1.5 rounded-lg border border-zinc-300 text-zinc-600 text-xs disabled:opacity-30 hover:bg-zinc-100 transition-colors"
             >
               Próxima →
+            </button>
+            <button
+              onClick={() => onPageChange(totalPages)}
+              disabled={page === totalPages}
+              className="px-3 py-1.5 rounded-lg border border-zinc-300 text-zinc-600 text-xs disabled:opacity-30 hover:bg-zinc-100 transition-colors"
+            >
+              »
             </button>
           </div>
         </div>
