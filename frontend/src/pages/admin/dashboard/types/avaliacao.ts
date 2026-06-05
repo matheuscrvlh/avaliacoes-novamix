@@ -5,4 +5,5 @@ export interface Avaliacao {
   nota: number
   comentario: string
   data: string
+  tipo: 'loja' | 'televendas'
 }

@@ -15,6 +15,7 @@ interface AvaliacoesTableProps {
   onFilterLoja: (val: string) => void;
   onFilterNota: (val: string) => void;
   onPageChange: (page: number) => void;
+  showLojaFilter?: boolean;
 }
 
 function formatarDataHora(valor: string | null | undefined) {
@@ -48,6 +49,7 @@ export function AvaliacoesTable({
   onFilterLoja,
   onFilterNota,
   onPageChange,
+  showLojaFilter = true,
 }: AvaliacoesTableProps) {
   const hasFilters = filterLoja !== "all" || filterNota !== "all";
 
@@ -144,18 +146,20 @@ export function AvaliacoesTable({
       {/* Filtros */}
       <div className="flex flex-wrap items-center gap-3 mb-3">
         <span className="text-sm text-zinc-500">Filtrar por:</span>
-        <select
-          value={filterLoja}
-          onChange={(e) => onFilterLoja(e.target.value)}
-          className="text-sm border border-zinc-300 rounded-lg px-3 py-1.5 shadow-sm text-black focus:outline-none focus:ring-2 focus:ring-orange-400"
-        >
-          <option value="all">Todas as lojas</option>
-          {lojas.map(([id, nome]) => (
-            <option key={id} value={String(id)}>
-              {nome}
-            </option>
-          ))}
-        </select>
+        {showLojaFilter && (
+          <select
+            value={filterLoja}
+            onChange={(e) => onFilterLoja(e.target.value)}
+            className="text-sm border border-zinc-300 rounded-lg px-3 py-1.5 shadow-sm text-black focus:outline-none focus:ring-2 focus:ring-orange-400"
+          >
+            <option value="all">Todas as lojas</option>
+            {lojas.map(([id, nome]) => (
+              <option key={id} value={String(id)}>
+                {nome}
+              </option>
+            ))}
+          </select>
+        )}
         <select
           value={filterNota}
           onChange={(e) => onFilterNota(e.target.value)}

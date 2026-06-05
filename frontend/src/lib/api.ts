@@ -21,12 +21,27 @@ export async function getAvaliacoes() {
       method: "GET",
       headers: { "Content-Type": "application/json" },
     })
-    
+
     const res = await response.json()
 
     return res
   } catch(err) {
     console.error('Erro ao buscar avaliacoes', err)
+  }
+}
+
+export async function postAvaliacaoTelevendas(
+  payload: AvaliacaoPayload
+): Promise<void> {
+  const response = await fetch(`${BASE_URL}/avaliacoes/televendas`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    const text = await response.text().catch(() => "");
+    throw new Error(`Erro ${response.status}: ${text || response.statusText}`);
   }
 }
 

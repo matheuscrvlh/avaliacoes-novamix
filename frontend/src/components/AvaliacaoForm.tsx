@@ -7,7 +7,7 @@ import type { SubmitStatus } from "@/types/avaliacao";
 
 interface AvaliacaoFormProps {
   nomeLoja: string;
-  lojaId: number;
+  lojaId?: number;
   nota: number;
   onNotaChange: (nota: number) => void;
   comentario: string;

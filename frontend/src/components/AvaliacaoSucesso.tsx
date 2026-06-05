@@ -1,7 +1,7 @@
 interface AvaliacaoSucessoProps {
   onReset: () => void;
   nota: number;
-  lojaId: number;
+  lojaId?: number;
 }
 
 import { googleLinks } from "@/pages/admin/constants";
@@ -38,7 +38,7 @@ export default function AvaliacaoSucesso({
       </p>
 
       <div className="flex flex-col items-center gap-3">
-        {nota === 5 && (
+        {nota === 5 && lojaId !== undefined && googleLinks[lojaId] && (
           <a
             href={googleLinks[lojaId]}
             target="_blank"

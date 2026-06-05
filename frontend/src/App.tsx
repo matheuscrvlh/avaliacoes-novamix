@@ -7,6 +7,7 @@ import { PrivateRoute } from "./components/auth/PrivateRoute";
 
 // pages
 import AvaliacaoPage from "@/pages/public/AvaliacaoPage";
+import TelevendasPage from "@/pages/public/TelevendasPage";
 import DashboardPage from "@/pages/admin/DashboardPage";
 import LoginPage from "@/pages/LoginPage";
 
@@ -15,6 +16,7 @@ export default function App() {
     <AuthProvider>
       <Routes>
         <Route path="/" element={<AvaliacaoPage />} />
+        <Route path="/televendas" element={<TelevendasPage />} />
         <Route path="/login" element={<LoginPage />} />
 
         <Route

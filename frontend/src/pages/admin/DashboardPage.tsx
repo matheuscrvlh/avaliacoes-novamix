@@ -6,7 +6,7 @@ import { AvaliacoesTable } from "../../pages/admin/dashboard/components/Avaliaco
 import { Footer } from "../admin/dashboard/components/Footer";
 //
 import { motion } from "framer-motion";
-import { Store, ChevronRight, LogOut } from "lucide-react";
+import { Store, ChevronRight, LogOut, Phone } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
@@ -18,6 +18,8 @@ export default function DashboardPage() {
     avaliacoes,
     loading,
     error,
+    activeTab,
+    handleTabChange,
     lojas,
     metrics,
     distribuicao,
@@ -74,15 +76,52 @@ export default function DashboardPage() {
         <div className="flex items-center justify-between bg-white p-5 rounded-xl shadow-sm border border-zinc-200">
           <div>
             <h1 className="flex items-center gap-2 text-2xl font-bold text-zinc-800">
-              <Store className="text-orange-500" size={22} />
-              Avaliações das Lojas
+              {activeTab === "loja" ? (
+                <>
+                  <Store className="text-orange-500" size={22} />
+                  Avaliações das Lojas
+                </>
+              ) : (
+                <>
+                  <Phone className="text-orange-500" size={22} />
+                  Avaliações do Televendas
+                </>
+              )}
             </h1>
             <p className="text-sm text-zinc-500 mt-1">
-              Acompanhe as avaliações e desempenho das filiais
+              {activeTab === "loja"
+                ? "Acompanhe as avaliações e desempenho das filiais"
+                : "Acompanhe as avaliações do setor de televendas"}
             </p>
           </div>
 
           <div className="flex items-center gap-4">
+            {/* Tabs Lojas / Televendas */}
+            <div className="flex gap-1 bg-zinc-100 border border-zinc-200 rounded-lg p-1">
+              <button
+                onClick={() => handleTabChange("loja")}
+                className={`flex items-center gap-1.5 px-4 py-1.5 text-sm font-medium rounded transition-colors ${
+                  activeTab === "loja"
+                    ? "bg-white text-zinc-800 shadow-sm"
+                    : "text-zinc-500 hover:text-zinc-700"
+                }`}
+              >
+                <Store size={13} />
+                Lojas
+              </button>
+              <button
+                onClick={() => handleTabChange("televendas")}
+                className={`flex items-center gap-1.5 px-4 py-1.5 text-sm font-medium rounded transition-colors ${
+                  activeTab === "televendas"
+                    ? "bg-white text-zinc-800 shadow-sm"
+                    : "text-zinc-500 hover:text-zinc-700"
+                }`}
+              >
+                <Phone size={13} />
+                Televendas
+              </button>
+            </div>
+
             <div className="text-right">
               <p className="text-2xl font-bold text-orange-500">
                 {metrics?.total || 0}
@@ -121,17 +160,21 @@ export default function DashboardPage() {
         />
       </div>
 
-      {/* cards lojas */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {(lojas || []).map(([id, nome]) => (
-          <LojaCard
-            key={id}
-            idfilial={id}
-            nome={nome}
-            avaliacoes={(avaliacoes || []).filter((a) => a.idfilial === id)}
-          />
-        ))}
-      </div>
+      {/* cards lojas — apenas na aba de lojas */}
+      {activeTab === "loja" && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {(lojas || []).map(([id, nome]) => (
+            <LojaCard
+              key={id}
+              idfilial={id}
+              nome={nome}
+              avaliacoes={(avaliacoes || []).filter(
+                (a) => a.idfilial === id && a.tipo === "loja",
+              )}
+            />
+          ))}
+        </div>
+      )}
 
       {/* graficos */}
       <div className="bg-white p-4 rounded-xl shadow-sm border border-zinc-200">
@@ -153,6 +196,7 @@ export default function DashboardPage() {
           onFilterLoja={handleFilterLoja}
           onFilterNota={handleFilterNota}
           onPageChange={handlePageChange}
+          showLojaFilter={activeTab === "loja"}
         />
       </div>
       <Footer />
