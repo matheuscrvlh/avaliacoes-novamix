@@ -15,45 +15,49 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-900 flex items-center justify-center px-4">
-      <div className="w-full max-w-sm">
-        <div className="text-center mb-8">
-          <h1 className="text-2xl font-semibold text-zinc-100">Novamix</h1>
-          <p className="text-sm text-zinc-500 mt-1">
-            Acesso ao painel administrativo
-          </p>
-        </div>
+    <main className="w-full min-h-screen flex relative overflow-hidden">
+      {/* Banner de fundo */}
+      <img
+        src="/bannerLogin.jpeg"
+        alt="Banner Novamix"
+        className="absolute inset-0 w-full h-full object-cover"
+      />
 
-        <form
-          onSubmit={onSubmit}
-          className="bg-zinc-800 border border-zinc-700 rounded-2xl p-6 flex flex-col gap-4"
-        >
-          <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-medium text-zinc-400">Usuário</label>
-            <input
-              type="text"
-              value={usuario}
-              onChange={(e) => setUsuario(e.target.value)}
-              placeholder="seu usuário"
-              required
-              className="bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-orange-500"
-            />
-          </div>
+      {/* Card de Login */}
+      <div
+        className="bg-white w-[90%] max-w-[380px] mx-auto my-auto flex flex-col gap-3 p-6
+                   justify-center rounded-xl shadow-2xl relative z-10
+                   md:w-[420px] md:max-w-[420px] md:absolute md:right-[8%]
+                   md:top-1/2 md:-translate-y-1/2 md:mx-0
+                   lg:right-[10%]"
+      >
+        <img
+          src="/logo.webp"
+          alt="Logo Novamix"
+          className="w-[45%] max-w-[140px] mx-auto mb-3"
+        />
 
-          <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-medium text-zinc-400">Senha</label>
-            <input
-              type="password"
-              value={senha}
-              onChange={(e) => setSenha(e.target.value)}
-              placeholder="••••••••"
-              required
-              className="bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-orange-500"
-            />
-          </div>
+        <form onSubmit={onSubmit} className="flex flex-col gap-3">
+          <input
+            type="text"
+            value={usuario}
+            onChange={(e) => setUsuario(e.target.value)}
+            placeholder="Usuário"
+            required
+            className="bg-zinc-100 w-full rounded p-3 text-base text-zinc-800 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-orange-500"
+          />
+
+          <input
+            type="password"
+            value={senha}
+            onChange={(e) => setSenha(e.target.value)}
+            placeholder="Senha"
+            required
+            className="bg-zinc-100 w-full rounded p-3 text-base text-zinc-800 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-orange-500"
+          />
 
           {error && (
-            <p className="text-xs text-red-400 bg-red-900/30 px-3 py-2 rounded-lg">
+            <p className="text-xs text-red-500 bg-red-50 px-3 py-2 rounded-lg">
               {error}
             </p>
           )}
@@ -61,12 +65,13 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="mt-1 bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium py-2.5 rounded-lg transition-colors disabled:opacity-50"
+            className="bg-orange-500 text-white font-semibold hover:bg-orange-400 hover:shadow-lg
+                       w-full rounded p-3 mt-3 transition-all active:scale-95 text-base disabled:opacity-50"
           >
-            {loading ? "Entrando..." : "Entrar"}
+            {loading ? "Entrando..." : "Login"}
           </button>
         </form>
       </div>
-    </div>
+    </main>
   );
 }
