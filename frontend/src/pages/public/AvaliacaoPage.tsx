@@ -3,6 +3,7 @@ import { useLojaParam } from "@/hooks/useLojaParam";
 import AvaliacaoForm from "@/components/AvaliacaoForm";
 import AvaliacaoSucesso from "@/components/AvaliacaoSucesso";
 import LojaInvalida from "@/components/ui/LojaInvalida";
+import SelecionarLojaModal from "@/components/SelecionarLojaModal";
 
 export default function AvaliacaoPage() {
   const loja = useLojaParam();
@@ -17,6 +18,9 @@ export default function AvaliacaoPage() {
     submit,
     reset,
   } = useAvaliacao(loja?.id ?? 0);
+
+  const params = new URLSearchParams(window.location.search);
+  if (!params.has("loja")) return <SelecionarLojaModal />;
 
   if (!loja) return <LojaInvalida />;
 
