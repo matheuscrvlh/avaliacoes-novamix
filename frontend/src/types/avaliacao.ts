@@ -16,6 +16,7 @@ export const LOJAS: Record<number, LojaInfo> = {
   2: { id: 2, nome: "Loja Centro" },
   3: { id: 3, nome: "Loja Olaria" },
   4: { id: 4, nome: "Loja Teresópolis" },
+  5: { id: 5, nome: "Televendas" },
 };
 
 

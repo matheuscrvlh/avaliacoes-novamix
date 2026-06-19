@@ -9,6 +9,7 @@ const LOJAS: Record<number, string> = {
   2: 'Centro',
   3: 'Olaria',
   4: 'Teresopolis',
+  5: 'Televendas',
 };
 
 export function getNomeLoja(lojaId: number): string {
@@ -27,21 +28,6 @@ export async function getAvaliacoes() {
     return res
   } catch(err) {
     console.error('Erro ao buscar avaliacoes', err)
-  }
-}
-
-export async function postAvaliacaoTelevendas(
-  payload: AvaliacaoPayload
-): Promise<void> {
-  const response = await fetch(`${BASE_URL}/avaliacoes/televendas`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
-
-  if (!response.ok) {
-    const text = await response.text().catch(() => "");
-    throw new Error(`Erro ${response.status}: ${text || response.statusText}`);
   }
 }
 

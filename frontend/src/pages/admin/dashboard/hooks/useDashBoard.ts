@@ -28,7 +28,7 @@ export function useDashboard() {
           nota: a.nota,
           comentario: a.comentario,
           data: a.data,
-          tipo: a.tipo ?? "loja",
+          tipo: a.nomefilial === "Televendas" ? "televendas" : "loja",
         }));
 
         setAvaliacoes(dadosFormatados);

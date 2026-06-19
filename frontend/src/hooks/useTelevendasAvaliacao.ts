@@ -1,6 +1,8 @@
 import { useState, useCallback } from "react";
-import { postAvaliacaoTelevendas } from "@/lib/api";
+import { postAvaliacao } from "@/lib/api";
 import type { SubmitStatus } from "@/types/avaliacao";
+
+const TELEVENDAS_ID = 5;
 
 export function useTelevendasAvaliacao() {
   const [nota, setNota] = useState<number>(0);
@@ -13,7 +15,7 @@ export function useTelevendasAvaliacao() {
     setStatus("loading");
     setErrorMsg("");
     try {
-      await postAvaliacaoTelevendas({
+      await postAvaliacao(TELEVENDAS_ID, {
         nota,
         comentario: comentario.trim() || null,
       });

@@ -7,14 +7,6 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Migração: adiciona coluna tipo para separar lojas de televendas
-const db = new Database("./database/banco.db");
-try {
-  db.exec("ALTER TABLE avaliacoes ADD COLUMN tipo TEXT DEFAULT 'loja'");
-} catch {
-  // coluna já existe
-}
-db.exec("UPDATE avaliacoes SET tipo = 'loja' WHERE tipo IS NULL");
 
 const avaliacoes = require("./routes/avaliacoes");
 const dashboard = require("./routes/dashboard");

@@ -13,27 +13,12 @@ router.post('/loja/:lojaId', (req, res) => {
 
   const data = new Date().toISOString()
   const stmt = db.prepare(
-    'INSERT INTO avaliacoes (idfilial, nomefilial, nota, comentario, data, tipo) VALUES (?, ?, ?, ?, ?, ?)'
+    'INSERT INTO avaliacoes (idfilial, nomefilial, nota, comentario, data) VALUES (?, ?, ?, ?, ?)'
   )
-  stmt.run(lojaId, nomeLoja, nota, comentario || null, data, 'loja')
+  stmt.run(lojaId, nomeLoja, nota, comentario || null, data)
 
   res.json({ sucesso: true })
 })
 
-router.post('/televendas', (req, res) => {
-  const { nota, comentario } = req.body
-
-  if (!nota) {
-    return res.status(400).json({ erro: 'Nota é obrigatória' })
-  }
-
-  const data = new Date().toISOString()
-  const stmt = db.prepare(
-    'INSERT INTO avaliacoes (idfilial, nomefilial, nota, comentario, data, tipo) VALUES (?, ?, ?, ?, ?, ?)'
-  )
-  stmt.run(0, 'Televendas', nota, comentario || null, data, 'televendas')
-
-  res.json({ sucesso: true })
-})
 
 module.exports = router
