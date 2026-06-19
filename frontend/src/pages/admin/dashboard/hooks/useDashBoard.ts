@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
-import { getAvaliacoes } from "../../../../lib/api";
+import { getAvaliacoes, deleteAvaliacao } from "../../../../lib/api";
 import { Avaliacao } from "../types/avaliacao";
 
 export type DashboardTab = "loja" | "televendas";
@@ -117,6 +117,11 @@ export function useDashboard() {
     setPage(1);
   }
 
+  async function handleDelete(ids: number[]) {
+    await Promise.all(ids.map((id) => deleteAvaliacao(id)));
+    setAvaliacoes((prev) => prev.filter((a) => !ids.includes(a.id)));
+  }
+
   return {
     avaliacoes,
     loading,
@@ -138,5 +143,6 @@ export function useDashboard() {
     handleFilterLoja,
     handleFilterNota,
     handlePageChange,
+    handleDelete,
   };
 }

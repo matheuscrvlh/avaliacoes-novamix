@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Avaliacao } from "../types/avaliacao";
 import { NotaBadge } from "./NotaBadge";
+import { ConfirmDeleteModal } from "./ConfirmDeleteModal";
 
 interface AvaliacoesTableProps {
   data: Avaliacao[];
@@ -15,6 +16,7 @@ interface AvaliacoesTableProps {
   onFilterLoja: (val: string) => void;
   onFilterNota: (val: string) => void;
   onPageChange: (page: number) => void;
+  onDelete: (ids: number[]) => Promise<void>;
   showLojaFilter?: boolean;
 }
 
@@ -49,12 +51,15 @@ export function AvaliacoesTable({
   onFilterLoja,
   onFilterNota,
   onPageChange,
+  onDelete,
   showLojaFilter = true,
 }: AvaliacoesTableProps) {
   const hasFilters = filterLoja !== "all" || filterNota !== "all";
 
   const [sortField, setSortField] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+  const [deleting, setDeleting] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   function handleSort(field: string) {
     if (sortField === field) {
@@ -88,6 +93,17 @@ export function AvaliacoesTable({
       setSelectedIds([]);
     } else {
       setSelectedIds(sortedData.map((a) => a.id));
+    }
+  }
+
+  async function handleDeleteConfirm() {
+    setDeleting(true);
+    try {
+      await onDelete(selectedIds);
+      setSelectedIds([]);
+      setShowConfirm(false);
+    } finally {
+      setDeleting(false);
     }
   }
 
@@ -127,16 +143,31 @@ export function AvaliacoesTable({
 
   return (
     <div>
+      {showConfirm && (
+        <ConfirmDeleteModal
+          count={selectedIds.length}
+          deleting={deleting}
+          onConfirm={handleDeleteConfirm}
+          onCancel={() => setShowConfirm(false)}
+        />
+      )}
       {selectedIds.length > 0 && (
         <div className="mb-3 flex items-center justify-between bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg px-4 py-2">
           <span className="text-sm text-orange-700 dark:text-orange-400">
             {selectedIds.length} selecionado(s)
           </span>
           <div className="flex gap-2">
-            <button className="text-xs px-3 py-1 bg-red-500 text-white rounded">
+            <button
+              onClick={() => setShowConfirm(true)}
+              disabled={deleting}
+              className="text-xs px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 disabled:opacity-50 transition-colors"
+            >
               Deletar
             </button>
-            <button className="text-xs px-3 py-1 bg-zinc-700 text-white rounded">
+            <button
+              onClick={exportarCSV}
+              className="text-xs px-3 py-1 bg-zinc-700 text-white rounded hover:bg-zinc-800 transition-colors"
+            >
               Exportar
             </button>
           </div>

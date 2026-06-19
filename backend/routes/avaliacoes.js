@@ -20,5 +20,22 @@ router.post('/loja/:lojaId', (req, res) => {
   res.json({ sucesso: true })
 })
 
+router.delete('/loja/:id', (req, res) => {
+  const { id } = req.params
+
+  if (!id) {
+    return res.status(400).json({ erro: 'Id da avaliação obrigatório' })
+  }
+
+  const stmt = db.prepare('DELETE FROM avaliacoes WHERE id = ?')
+  const result = stmt.run(Number(id))
+
+  if (result.changes === 0) {
+    return res.status(404).json({ erro: 'Avaliação não encontrada' })
+  }
+
+  res.json({ sucesso: true })
+})
+
 
 module.exports = router

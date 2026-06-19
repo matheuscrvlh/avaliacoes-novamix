@@ -36,6 +36,7 @@ export default function DashboardPage() {
     handleFilterLoja,
     handleFilterNota,
     handlePageChange,
+    handleDelete,
   } = useDashboard();
 
   function handleLogout() {
@@ -207,6 +208,7 @@ export default function DashboardPage() {
           onFilterLoja={handleFilterLoja}
           onFilterNota={handleFilterNota}
           onPageChange={handlePageChange}
+          onDelete={handleDelete}
           showLojaFilter={activeTab === "loja"}
         />
       </div>

@@ -31,6 +31,18 @@ export async function getAvaliacoes() {
   }
 }
 
+export async function deleteAvaliacao(id: number): Promise<void> {
+  const response = await fetch(`${BASE_URL}/avaliacoes/loja/${id}`, {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+  });
+
+  if (!response.ok) {
+    const text = await response.text().catch(() => "");
+    throw new Error(`Erro ${response.status}: ${text || response.statusText}`);
+  }
+}
+
 export async function postAvaliacao(
   lojaId: number,
   payload: AvaliacaoPayload
