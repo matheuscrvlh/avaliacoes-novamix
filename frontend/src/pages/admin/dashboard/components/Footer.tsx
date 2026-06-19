@@ -5,7 +5,7 @@ export function Footer() {
 
       <div className="flex flex-col md:flex-row items-center gap-2 md:gap-4">
         <a
-          href="https://github.com/marlonalvees"
+          href="https://www.marlonalves.dev/"
           target="_blank"
           rel="noreferrer"
           className="flex items-center gap-1 hover:text-orange-500 transition"
