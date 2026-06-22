@@ -7,7 +7,6 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-
 const avaliacoes = require("./routes/avaliacoes");
 const dashboard = require("./routes/dashboard");
 const auth = require("./routes/auth");
