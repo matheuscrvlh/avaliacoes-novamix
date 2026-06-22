@@ -9,10 +9,25 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | null>(null)
 
+function tokenValido(token: string | null): boolean {
+  if (!token) return false
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]))
+    return payload.exp * 1000 > Date.now()
+  } catch {
+    return false
+  }
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [token, setToken] = useState<string | null>(
-    () => localStorage.getItem("token")
-  )
+  const [token, setToken] = useState<string | null>(() => {
+    const stored = localStorage.getItem("token")
+    if (!tokenValido(stored)) {
+      localStorage.removeItem("token")
+      return null
+    }
+    return stored
+  })
 
   function login(newToken: string) {
     localStorage.setItem("token", newToken)
@@ -25,7 +40,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ token, login, logout, isAuthenticated: !!token }}>
+    <AuthContext.Provider value={{ token, login, logout, isAuthenticated: tokenValido(token) }}>
       {children}
     </AuthContext.Provider>
   )

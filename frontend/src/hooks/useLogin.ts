@@ -1,6 +1,8 @@
 import { useState } from "react"
 import { useAuth } from "../context/AuthContext"
 
+const BASE_URL = import.meta.env.VITE_API_URL ?? "https://avaliacoes.lojanovamix.com.br/api"
+
 export function useLogin() {
   const { login } = useAuth()
   const [loading, setLoading] = useState(false)
@@ -11,7 +13,7 @@ export function useLogin() {
       setLoading(true)
       setError(null)
 
-      const res = await fetch("http://localhost:3000/auth/login", {
+      const res = await fetch(`${BASE_URL}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ usuario, senha }),
