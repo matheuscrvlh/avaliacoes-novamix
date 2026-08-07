@@ -10,7 +10,7 @@ import { useAuth } from "../../context/AuthContext";
 import { useTheme } from "../../hooks/useTheme";
 
 export default function DashboardPage() {
-  const { logout, isAdmin } = useAuth();
+  const { voltarAoHub, isAdmin } = useAuth();
   const { dark, toggle } = useTheme();
 
   const {
@@ -130,7 +130,7 @@ export default function DashboardPage() {
             </button>
 
             <button
-              onClick={() => logout()}
+              onClick={voltarAoHub}
               className="flex items-center gap-2 text-xs font-medium px-3 py-2 rounded-lg border border-zinc-200 dark:border-zinc-600 text-zinc-500 dark:text-zinc-400 hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-500 hover:border-red-200 dark:hover:border-red-800 transition-colors"
             >
               <LogOut size={14} />

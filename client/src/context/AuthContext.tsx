@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react"
-import { getSessao, logout as logoutRequest, HUB_URL, SessaoAvaliacoes } from "../lib/api"
+import { getSessao, HUB_URL, SessaoAvaliacoes } from "../lib/api"
 
 interface AuthContextType {
   loading: boolean
@@ -7,7 +7,7 @@ interface AuthContextType {
   access: SessaoAvaliacoes["access"] | null
   filiais: number[]
   isAdmin: boolean
-  logout: () => Promise<void>
+  voltarAoHub: () => void
 }
 
 const AuthContext = createContext<AuthContextType | null>(null)
@@ -22,9 +22,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .finally(() => setLoading(false))
   }, [])
 
-  async function logout() {
-    await logoutRequest()
-    setSessao(null)
+  function voltarAoHub() {
     window.location.href = HUB_URL
   }
 
@@ -36,7 +34,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         access: sessao?.access ?? null,
         filiais: sessao?.filiais ?? [],
         isAdmin: sessao?.access === "admin",
-        logout,
+        voltarAoHub,
       }}
     >
       {children}

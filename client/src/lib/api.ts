@@ -36,13 +36,6 @@ export async function getSessao(): Promise<SessaoAvaliacoes | null> {
   return response.json();
 }
 
-export async function logout(): Promise<void> {
-  await fetch(`${BASE_URL}/auth/logout`, {
-    method: "POST",
-    credentials: "include",
-  });
-}
-
 export async function getAvaliacoes() {
   const response = await fetch(`${BASE_URL}/dashboard`, {
     method: "GET",

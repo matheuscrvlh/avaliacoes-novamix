@@ -13,11 +13,6 @@ const AVALIACOES_MODULE = "avaliacoes";
 const PRADO_ID = 1;
 const TELEVENDAS_ID = 5;
 
-const COOKIE_OPTIONS = {
-  domain: ".lojanovamix.com.br",
-  path: "/",
-};
-
 function autenticar(req, res, next) {
   const authHeader = req.headers.authorization;
   const token = req.cookies?.token ?? authHeader?.split(" ")[1];
@@ -71,11 +66,6 @@ router.get("/me", autenticar, requireAvaliacoesAccess, (req, res) => {
     access: req.avaliacoesAccess,
     filiais: req.filiaisPermitidas,
   });
-});
-
-router.post("/logout", (req, res) => {
-  res.clearCookie("token", COOKIE_OPTIONS);
-  res.json({ sucesso: true });
 });
 
 module.exports = router;

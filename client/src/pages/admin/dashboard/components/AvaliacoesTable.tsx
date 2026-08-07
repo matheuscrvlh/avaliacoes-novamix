@@ -157,15 +157,22 @@ export function AvaliacoesTable({
             {selectedIds.length} selecionado(s)
           </span>
           <div className="flex gap-2">
-            {canDelete && (
-              <button
-                onClick={() => setShowConfirm(true)}
-                disabled={deleting}
-                className="text-xs px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 disabled:opacity-50 transition-colors"
-              >
-                Deletar
-              </button>
-            )}
+            <button
+              onClick={() => setShowConfirm(true)}
+              disabled={deleting || !canDelete}
+              title={
+                canDelete
+                  ? undefined
+                  : "Você precisa ser administrador do módulo avaliações para fazer essa ação."
+              }
+              className={`text-xs px-3 py-1 rounded transition-colors ${
+                canDelete
+                  ? "bg-red-500 text-white hover:bg-red-600 disabled:opacity-50"
+                  : "bg-zinc-300 dark:bg-zinc-600 text-zinc-500 dark:text-zinc-400 cursor-not-allowed"
+              }`}
+            >
+              Deletar
+            </button>
             <button
               onClick={exportarCSV}
               className="text-xs px-3 py-1 bg-zinc-700 text-white rounded hover:bg-zinc-800 transition-colors"
@@ -371,9 +378,9 @@ export function AvaliacoesTable({
                     <td className="px-4 py-3">
                       <NotaBadge nota={Number(a.nota)} />
                     </td>
-                    <td className="px-4 py-3 text-zinc-600 dark:text-zinc-400 max-w-xs">
+                    <td className="px-4 py-3 text-zinc-600 dark:text-zinc-400 max-w-sm">
                       {a.comentario?.trim() ? (
-                        <span className="line-clamp-2">{a.comentario}</span>
+                        <span className="whitespace-pre-wrap break-words">{a.comentario}</span>
                       ) : (
                         <span className="text-zinc-400 dark:text-zinc-600">—</span>
                       )}
