@@ -2,12 +2,18 @@
 node_modules/
 .prettierrc.json
 
+# IA
+.claude
+
 # build
 dist/
 build/
 
 # ambiente
 .env
+
+# banco de dados local (persistido via volume, nunca deve ir pro git)
+*.db
 
 # logs
 npm-debug.log*

@@ -1,20 +1,20 @@
 services:
-  backend:
-    build: ./backend
+  server:
+    build: ./server
     env_file:
-      - ./backend/.env
-    container_name: avaliacoes-backend
+      - ./server/.env
+    container_name: avaliacoes-server
     restart: always
     ports: 
       - "3002:3000"
     volumes:
-      - ./backend/database:/app/database  # persiste o SQLite
+      - ./server/database:/app/database
 
-  frontend:
-    build: ./frontend
-    container_name: avaliacoes-frontend
+  client:
+    build: ./client
+    container_name: avaliacoes-client
     restart: always
     ports:
       - "8082:80"
     depends_on:
-      - backend
+      - server
