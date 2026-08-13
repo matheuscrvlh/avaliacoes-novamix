@@ -1,10 +1,9 @@
 const express = require('express')
 const router = express.Router()
-const Database = require('better-sqlite3')
-const db = new Database('./database/banco.db')
+const pool = require('../database/database')
 const { autenticar, requireAvaliacoesAccess, requireAvaliacoesAdmin } = require('./auth')
 
-router.post('/loja/:lojaId', (req, res) => {
+router.post('/loja/:lojaId', async (req, res) => {
   const { lojaId } = req.params
   const { nomeLoja, nota, comentario } = req.body
 
@@ -13,22 +12,22 @@ router.post('/loja/:lojaId', (req, res) => {
   }
 
   const data = new Date().toISOString()
-  const stmt = db.prepare(
-    'INSERT INTO avaliacoes (idfilial, nomefilial, nota, comentario, data) VALUES (?, ?, ?, ?, ?)'
+  await pool.query(
+    'INSERT INTO avaliacoes (idfilial, nomefilial, nota, comentario, data) VALUES ($1, $2, $3, $4, $5)',
+    [lojaId, nomeLoja, nota, comentario || null, data]
   )
-  stmt.run(lojaId, nomeLoja, nota, comentario || null, data)
 
   res.json({ sucesso: true })
 })
 
-router.delete('/loja/:id', autenticar, requireAvaliacoesAccess, requireAvaliacoesAdmin, (req, res) => {
+router.delete('/loja/:id', autenticar, requireAvaliacoesAccess, requireAvaliacoesAdmin, async (req, res) => {
   const { id } = req.params
 
   if (!id) {
     return res.status(400).json({ erro: 'Id da avaliação obrigatório' })
   }
 
-  const avaliacao = db.prepare('SELECT idfilial FROM avaliacoes WHERE id = ?').get(Number(id))
+  const { rows: [avaliacao] } = await pool.query('SELECT idfilial FROM avaliacoes WHERE id = $1', [Number(id)])
 
   if (!avaliacao) {
     return res.status(404).json({ erro: 'Avaliação não encontrada' })
@@ -38,8 +37,7 @@ router.delete('/loja/:id', autenticar, requireAvaliacoesAccess, requireAvaliacoe
     return res.status(403).json({ erro: 'Sem permissão para excluir avaliações desta filial.' })
   }
 
-  const stmt = db.prepare('DELETE FROM avaliacoes WHERE id = ?')
-  stmt.run(Number(id))
+  await pool.query('DELETE FROM avaliacoes WHERE id = $1', [Number(id)])
 
   res.json({ sucesso: true })
 })

@@ -5,10 +5,8 @@ services:
       - ./server/.env
     container_name: avaliacoes-server
     restart: always
-    ports: 
+    ports:
       - "3002:3000"
-    volumes:
-      - ./server/database:/app/database
 
   client:
     build: ./client
