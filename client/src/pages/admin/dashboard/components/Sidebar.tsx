@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Menu, X, LogOut, ExternalLink } from "lucide-react";
+import { Menu, X, LogOut } from "lucide-react";
 import { HUB_URL } from "../../../../lib/api";
 import type { DashboardTab } from "../hooks/useDashBoard";
 
@@ -10,7 +10,7 @@ interface SidebarProps {
 }
 
 const linkBase =
-  "flex items-center justify-between w-full rounded-lg px-4 py-2 text-left text-sm font-semibold transition-colors";
+  "block w-full rounded-lg px-4 py-2 text-center text-sm font-semibold transition-colors";
 const linkActive = "bg-orange-500 text-white";
 const linkInactive =
   "text-zinc-600 hover:bg-orange-50 hover:text-orange-600 dark:text-zinc-300 dark:hover:bg-orange-500/10 dark:hover:text-orange-400";
@@ -60,11 +60,11 @@ export function Sidebar({ activeTab, onTabChange }: SidebarProps) {
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <div className="flex items-center justify-center py-6">
+        <div className="flex items-center justify-center py-4">
           <img
             src="/logo.webp"
             alt="Novamix Food Service"
-            className="w-[70%] max-w-[160px] object-contain"
+            className="w-[55%] max-w-32 rounded-lg bg-white object-contain dark:p-1.5"
           />
         </div>
 
@@ -90,7 +90,6 @@ export function Sidebar({ activeTab, onTabChange }: SidebarProps) {
             className={`${linkBase} ${linkInactive}`}
           >
             Área Cliente
-            <ExternalLink size={14} />
           </Link>
         </nav>
 
