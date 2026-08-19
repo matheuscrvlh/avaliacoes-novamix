@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react"
-import { getSessao, HUB_URL, SessaoAvaliacoes } from "../lib/api"
+import { getSessao, SessaoAvaliacoes } from "../lib/api"
 
 interface AuthContextType {
   loading: boolean
@@ -7,7 +7,6 @@ interface AuthContextType {
   access: SessaoAvaliacoes["access"] | null
   filiais: number[]
   isAdmin: boolean
-  voltarAoHub: () => void
 }
 
 const AuthContext = createContext<AuthContextType | null>(null)
@@ -22,10 +21,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .finally(() => setLoading(false))
   }, [])
 
-  function voltarAoHub() {
-    window.location.href = HUB_URL
-  }
-
   return (
     <AuthContext.Provider
       value={{
@@ -34,7 +29,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         access: sessao?.access ?? null,
         filiais: sessao?.filiais ?? [],
         isAdmin: sessao?.access === "admin",
-        voltarAoHub,
       }}
     >
       {children}
