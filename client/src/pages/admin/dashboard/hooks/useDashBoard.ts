@@ -3,6 +3,61 @@ import { getAvaliacoes, deleteAvaliacao } from "../../../../lib/api";
 import { Avaliacao } from "../types/avaliacao";
 
 export type DashboardTab = "loja" | "televendas";
+export type PeriodoFiltro = "all" | "dia" | "semana" | "mes";
+
+const TIMEZONE = "America/Sao_Paulo";
+
+function getDataKeyEmSaoPaulo(data: Date) {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: TIMEZONE,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(data);
+
+  const map: Record<string, string> = {};
+  parts.forEach((p) => (map[p.type] = p.value));
+
+  const year = Number(map.year);
+  const month = Number(map.month);
+  const day = Number(map.day);
+
+  return {
+    year,
+    month,
+    day,
+    epochDay: Math.floor(Date.UTC(year, month - 1, day) / 86400000),
+  };
+}
+
+function estaNoPeriodo(dataIso: string, periodo: PeriodoFiltro) {
+  if (periodo === "all") return true;
+
+  const alvo = getDataKeyEmSaoPaulo(new Date(dataIso));
+  const agora = getDataKeyEmSaoPaulo(new Date());
+
+  if (periodo === "dia") {
+    return (
+      alvo.year === agora.year &&
+      alvo.month === agora.month &&
+      alvo.day === agora.day
+    );
+  }
+
+  if (periodo === "mes") {
+    return alvo.year === agora.year && alvo.month === agora.month;
+  }
+
+  // semana: semana corrente, de segunda a domingo
+  const diaSemanaAgora = new Date(
+    Date.UTC(agora.year, agora.month - 1, agora.day),
+  ).getUTCDay();
+  const indiceSegunda = (diaSemanaAgora + 6) % 7; // Seg=0 ... Dom=6
+  const inicioSemana = agora.epochDay - indiceSegunda;
+  const fimSemana = inicioSemana + 6;
+
+  return alvo.epochDay >= inicioSemana && alvo.epochDay <= fimSemana;
+}
 
 export function useDashboard() {
   const [avaliacoes, setAvaliacoes] = useState<Avaliacao[]>([]);
@@ -11,6 +66,7 @@ export function useDashboard() {
   const [activeTab, setActiveTab] = useState<DashboardTab>("loja");
   const [filterLoja, setFilterLoja] = useState("all");
   const [filterNota, setFilterNota] = useState("all");
+  const [filterPeriodo, setFilterPeriodo] = useState<PeriodoFiltro>("all");
   const [page, setPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
@@ -81,9 +137,10 @@ export function useDashboard() {
         const okLoja =
           filterLoja === "all" || String(a.idfilial) === filterLoja;
         const okNota = filterNota === "all" || String(a.nota) === filterNota;
-        return okLoja && okNota;
+        const okPeriodo = estaNoPeriodo(a.data, filterPeriodo);
+        return okLoja && okNota && okPeriodo;
       }),
-    [tabData, filterLoja, filterNota],
+    [tabData, filterLoja, filterNota, filterPeriodo],
   );
 
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
@@ -96,6 +153,7 @@ export function useDashboard() {
     setActiveTab(tab);
     setFilterLoja("all");
     setFilterNota("all");
+    setFilterPeriodo("all");
     setPage(1);
   }
 
@@ -105,6 +163,10 @@ export function useDashboard() {
   }
   function handleFilterNota(val: string) {
     setFilterNota(val);
+    setPage(1);
+  }
+  function handleFilterPeriodo(val: PeriodoFiltro) {
+    setFilterPeriodo(val);
     setPage(1);
   }
   function handlePageChange(p: number) {
@@ -134,6 +196,7 @@ export function useDashboard() {
     pageData,
     filterLoja,
     filterNota,
+    filterPeriodo,
     page,
     totalPages,
     itemsPerPage,
@@ -141,6 +204,7 @@ export function useDashboard() {
     handleItemsPerPageChange,
     handleFilterLoja,
     handleFilterNota,
+    handleFilterPeriodo,
     handlePageChange,
     handleDelete,
   };

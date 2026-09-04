@@ -27,12 +27,14 @@ export default function DashboardPage() {
     pageData,
     filterLoja,
     filterNota,
+    filterPeriodo,
     page,
     totalPages,
     itemsPerPage,
     handleItemsPerPageChange,
     handleFilterLoja,
     handleFilterNota,
+    handleFilterPeriodo,
     handlePageChange,
     handleDelete,
   } = useDashboard();
@@ -195,12 +197,14 @@ export default function DashboardPage() {
           lojas={lojas || []}
           filterLoja={filterLoja}
           filterNota={filterNota}
+          filterPeriodo={filterPeriodo}
           page={page}
           totalPages={totalPages}
           itemsPerPage={itemsPerPage}
           onItemsPerPageChange={handleItemsPerPageChange}
           onFilterLoja={handleFilterLoja}
           onFilterNota={handleFilterNota}
+          onFilterPeriodo={handleFilterPeriodo}
           onPageChange={handlePageChange}
           onDelete={handleDelete}
           showLojaFilter={activeTab === "loja"}
