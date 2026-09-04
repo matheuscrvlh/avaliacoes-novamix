@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Avaliacao } from "../types/avaliacao";
+import { PeriodoFiltro } from "../hooks/useDashBoard";
 import { NotaBadge } from "./NotaBadge";
 import { ConfirmDeleteModal } from "./ConfirmDeleteModal";
 
@@ -9,12 +10,14 @@ interface AvaliacoesTableProps {
   lojas: [number, string][];
   filterLoja: string;
   filterNota: string;
+  filterPeriodo: PeriodoFiltro;
   page: number;
   totalPages: number;
   itemsPerPage: number;
   onItemsPerPageChange: (value: number) => void;
   onFilterLoja: (val: string) => void;
   onFilterNota: (val: string) => void;
+  onFilterPeriodo: (val: PeriodoFiltro) => void;
   onPageChange: (page: number) => void;
   onDelete: (ids: number[]) => Promise<void>;
   showLojaFilter?: boolean;
@@ -45,18 +48,21 @@ export function AvaliacoesTable({
   lojas,
   filterLoja,
   filterNota,
+  filterPeriodo,
   page,
   totalPages,
   itemsPerPage,
   onItemsPerPageChange,
   onFilterLoja,
   onFilterNota,
+  onFilterPeriodo,
   onPageChange,
   onDelete,
   showLojaFilter = true,
   canDelete = false,
 }: AvaliacoesTableProps) {
-  const hasFilters = filterLoja !== "all" || filterNota !== "all";
+  const hasFilters =
+    filterLoja !== "all" || filterNota !== "all" || filterPeriodo !== "all";
 
   const [sortField, setSortField] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
@@ -211,11 +217,22 @@ export function AvaliacoesTable({
             </option>
           ))}
         </select>
+        <select
+          value={filterPeriodo}
+          onChange={(e) => onFilterPeriodo(e.target.value as PeriodoFiltro)}
+          className="text-sm border border-zinc-300 dark:border-zinc-600 rounded-lg px-3 py-1.5 shadow-sm text-black dark:text-zinc-100 bg-white dark:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-orange-400"
+        >
+          <option value="all">Qualquer período</option>
+          <option value="dia">Hoje</option>
+          <option value="semana">Esta semana</option>
+          <option value="mes">Este mês</option>
+        </select>
         {hasFilters && (
           <button
             onClick={() => {
               onFilterLoja("all");
               onFilterNota("all");
+              onFilterPeriodo("all");
             }}
             className="text-xs text-zinc-500 dark:text-zinc-400 hover:text-black dark:hover:text-zinc-100 underline"
           >
