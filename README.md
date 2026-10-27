@@ -45,8 +45,10 @@ O parâmetro `?loja=` identifica a filial avaliada. Sem ele, o cliente escolhe a
 - Acesso protegido: não existe login neste sistema, a sessão vem do **Hub** (`hub.lojanovamix.com.br`). Sem sessão válida, o usuário é redirecionado para o Hub.
 - Abas **Lojas** e **Televendas**
 - Métricas (total, nota média, % de notas 5, comentários), cards por loja e distribuição de notas
-- Filtros por loja, nota e período (fuso `America/Sao_Paulo`)
-- Ordenação por loja, nota e data (vale para todos os resultados, não só a página atual)
+- Filtros por loja, nota, período (hoje, semana, mês ou intervalo de datas, no fuso `America/Sao_Paulo`) e busca por texto nos comentários (ignora acentos e maiúsculas)
+- Filtros, ordenação e página ficam na URL, então atualizar a página (F5) ou compartilhar o link mantém a visão
+- Ordenação por loja, nota e data (vale para todos os resultados, não só a página atual), com cabeçalhos acessíveis por teclado
+- Esqueleto de carregamento e botão "Tentar de novo" quando a API falha
 - Seleção múltipla (o checkbox do cabeçalho seleciona todos os resultados filtrados, em todas as páginas)
 - Exclusão de avaliações (apenas admin do módulo)
 - Exportação CSV dos selecionados ou, sem seleção, de todos os resultados filtrados

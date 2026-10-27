@@ -1,4 +1,5 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { ArrowDown, ArrowUp, ArrowUpDown, Download, Search, X } from "lucide-react";
 import { Avaliacao } from "../types/avaliacao";
 import { PeriodoFiltro, SortDirection, SortField } from "../hooks/useDashBoard";
 import { NotaBadge } from "./NotaBadge";
@@ -14,6 +15,9 @@ interface AvaliacoesTableProps {
   filterLoja: string;
   filterNota: string;
   filterPeriodo: PeriodoFiltro;
+  dataInicio: string;
+  dataFim: string;
+  filterBusca: string;
   sortField: SortField | null;
   sortDirection: SortDirection;
   onSort: (field: SortField) => void;
@@ -24,6 +28,10 @@ interface AvaliacoesTableProps {
   onFilterLoja: (val: string) => void;
   onFilterNota: (val: string) => void;
   onFilterPeriodo: (val: PeriodoFiltro) => void;
+  onDataInicio: (val: string) => void;
+  onDataFim: (val: string) => void;
+  onFilterBusca: (val: string) => void;
+  onClearFilters: () => void;
   onPageChange: (page: number) => void;
   onDelete: (ids: number[]) => Promise<void>;
   showLojaFilter?: boolean;
@@ -48,6 +56,9 @@ function formatarDataHora(valor: string | null | undefined) {
   return { data, hora };
 }
 
+const campoClass =
+  "text-sm border border-zinc-300 dark:border-zinc-600 rounded-lg px-3 py-1.5 shadow-sm text-black dark:text-zinc-100 bg-white dark:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-orange-400 dark:[color-scheme:dark]";
+
 export function AvaliacoesTable({
   data,
   allData,
@@ -55,6 +66,9 @@ export function AvaliacoesTable({
   filterLoja,
   filterNota,
   filterPeriodo,
+  dataInicio,
+  dataFim,
+  filterBusca,
   sortField,
   sortDirection,
   onSort,
@@ -65,17 +79,37 @@ export function AvaliacoesTable({
   onFilterLoja,
   onFilterNota,
   onFilterPeriodo,
+  onDataInicio,
+  onDataFim,
+  onFilterBusca,
+  onClearFilters,
   onPageChange,
   onDelete,
   showLojaFilter = true,
   canDelete = false,
 }: AvaliacoesTableProps) {
   const hasFilters =
-    filterLoja !== "all" || filterNota !== "all" || filterPeriodo !== "all";
+    filterLoja !== "all" ||
+    filterNota !== "all" ||
+    filterPeriodo !== "all" ||
+    filterBusca !== "";
 
   const [deleting, setDeleting] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [rawSelectedIds, setRawSelectedIds] = useState<number[]>([]);
+
+  // O campo de busca é local e só atualiza a URL depois que a pessoa para de digitar
+  const [buscaLocal, setBuscaLocal] = useState(filterBusca);
+
+  useEffect(() => {
+    setBuscaLocal(filterBusca);
+  }, [filterBusca]);
+
+  useEffect(() => {
+    if (buscaLocal === filterBusca) return;
+    const timer = setTimeout(() => onFilterBusca(buscaLocal), 300);
+    return () => clearTimeout(timer);
+  }, [buscaLocal, filterBusca, onFilterBusca]);
 
   // Ignora seleções que saíram do resultado (filtro alterado, aba trocada),
   // para nunca excluir/exportar linhas que o usuário não está vendo.
@@ -125,10 +159,48 @@ export function AvaliacoesTable({
     baixarCSV("avaliacoes.csv", cabecalho, linhas);
   }
 
-  function indicadorOrdem(field: SortField) {
-    if (sortField !== field) return null;
-    return sortDirection === "asc" ? "↑" : "↓";
+  function cabecalhoOrdenavel(field: SortField, label: string) {
+    const ativo = sortField === field;
+    const Icone = !ativo ? ArrowUpDown : sortDirection === "asc" ? ArrowUp : ArrowDown;
+
+    return (
+      <th
+        scope="col"
+        aria-sort={
+          ativo ? (sortDirection === "asc" ? "ascending" : "descending") : "none"
+        }
+        className="px-4 py-3 text-left"
+      >
+        <button
+          type="button"
+          onClick={() => onSort(field)}
+          className="group inline-flex items-center gap-1 rounded text-xs font-semibold uppercase tracking-wide text-white/90 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
+        >
+          {label}
+          <Icone
+            size={13}
+            aria-hidden="true"
+            className={ativo ? "opacity-100" : "opacity-60 group-hover:opacity-100"}
+          />
+        </button>
+      </th>
+    );
   }
+
+  const nenhumResultado = (
+    <>
+      Nenhuma avaliação encontrada.
+      {hasFilters && (
+        <button
+          type="button"
+          onClick={onClearFilters}
+          className="ml-2 underline hover:text-black dark:hover:text-zinc-100"
+        >
+          Limpar filtros
+        </button>
+      )}
+    </>
+  );
 
   return (
     <div>
@@ -145,32 +217,52 @@ export function AvaliacoesTable({
           <span className="text-sm text-orange-700 dark:text-orange-400">
             {selectedIds.length} selecionado(s)
           </span>
-          <div className="flex gap-2">
+          {canDelete ? (
             <button
               onClick={() => setShowConfirm(true)}
-              disabled={deleting || !canDelete}
-              title={
-                canDelete
-                  ? undefined
-                  : "Você precisa ser administrador do módulo avaliações para fazer essa ação."
-              }
-              className={`text-xs px-3 py-1 rounded transition-colors ${
-                canDelete
-                  ? "bg-red-500 text-white hover:bg-red-600 disabled:opacity-50"
-                  : "bg-zinc-300 dark:bg-zinc-600 text-zinc-500 dark:text-zinc-400 cursor-not-allowed"
-              }`}
+              disabled={deleting}
+              className="text-xs px-3 py-1 rounded bg-red-500 text-white hover:bg-red-600 disabled:opacity-50 transition-colors"
             >
               Deletar
             </button>
-            <button
-              onClick={exportarCSV}
-              className="text-xs px-3 py-1 bg-zinc-700 text-white rounded hover:bg-zinc-800 transition-colors"
-            >
-              Exportar
-            </button>
-          </div>
+          ) : (
+            <span className="text-xs text-zinc-500 dark:text-zinc-400">
+              Só administradores do módulo podem excluir avaliações.
+            </span>
+          )}
         </div>
       )}
+
+      <div className="mb-3 flex flex-wrap items-center gap-3">
+        <div className="relative w-full sm:w-72">
+          <Search
+            size={15}
+            aria-hidden="true"
+            className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400"
+          />
+          <input
+            type="search"
+            value={buscaLocal}
+            onChange={(e) => setBuscaLocal(e.target.value)}
+            placeholder="Buscar nos comentários..."
+            aria-label="Buscar nos comentários"
+            className={`${campoClass} w-full pl-9 pr-8 [&::-webkit-search-cancel-button]:hidden`}
+          />
+          {buscaLocal && (
+            <button
+              type="button"
+              onClick={() => {
+                setBuscaLocal("");
+                onFilterBusca("");
+              }}
+              aria-label="Limpar busca"
+              className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-0.5 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200"
+            >
+              <X size={14} aria-hidden="true" />
+            </button>
+          )}
+        </div>
+      </div>
 
       <div className="flex flex-wrap items-center gap-3 mb-3">
         <span className="text-sm text-zinc-500 dark:text-zinc-400">Filtrar por:</span>
@@ -178,7 +270,8 @@ export function AvaliacoesTable({
           <select
             value={filterLoja}
             onChange={(e) => onFilterLoja(e.target.value)}
-            className="text-sm border border-zinc-300 dark:border-zinc-600 rounded-lg px-3 py-1.5 shadow-sm text-black dark:text-zinc-100 bg-white dark:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-orange-400"
+            aria-label="Filtrar por loja"
+            className={campoClass}
           >
             <option value="all">Todas as lojas</option>
             {lojas.map(([id, nome]) => (
@@ -191,7 +284,8 @@ export function AvaliacoesTable({
         <select
           value={filterNota}
           onChange={(e) => onFilterNota(e.target.value)}
-          className="text-sm border border-zinc-300 dark:border-zinc-600 rounded-lg px-3 py-1.5 shadow-sm text-black dark:text-zinc-100 bg-white dark:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-orange-400"
+          aria-label="Filtrar por nota"
+          className={campoClass}
         >
           <option value="all">Todas as notas</option>
           {[5, 4, 3, 2, 1].map((n) => (
@@ -203,20 +297,39 @@ export function AvaliacoesTable({
         <select
           value={filterPeriodo}
           onChange={(e) => onFilterPeriodo(e.target.value as PeriodoFiltro)}
-          className="text-sm border border-zinc-300 dark:border-zinc-600 rounded-lg px-3 py-1.5 shadow-sm text-black dark:text-zinc-100 bg-white dark:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-orange-400"
+          aria-label="Filtrar por período"
+          className={campoClass}
         >
           <option value="all">Qualquer período</option>
           <option value="dia">Hoje</option>
           <option value="semana">Esta semana</option>
           <option value="mes">Este mês</option>
+          <option value="custom">Intervalo de datas</option>
         </select>
+        {filterPeriodo === "custom" && (
+          <div className="flex flex-wrap items-center gap-2">
+            <input
+              type="date"
+              value={dataInicio}
+              max={dataFim || undefined}
+              onChange={(e) => onDataInicio(e.target.value)}
+              aria-label="Data inicial"
+              className={campoClass}
+            />
+            <span className="text-sm text-zinc-500 dark:text-zinc-400">até</span>
+            <input
+              type="date"
+              value={dataFim}
+              min={dataInicio || undefined}
+              onChange={(e) => onDataFim(e.target.value)}
+              aria-label="Data final"
+              className={campoClass}
+            />
+          </div>
+        )}
         {hasFilters && (
           <button
-            onClick={() => {
-              onFilterLoja("all");
-              onFilterNota("all");
-              onFilterPeriodo("all");
-            }}
+            onClick={onClearFilters}
             className="text-xs text-zinc-500 dark:text-zinc-400 hover:text-black dark:hover:text-zinc-100 underline"
           >
             Limpar filtros
@@ -226,7 +339,8 @@ export function AvaliacoesTable({
         <select
           value={itemsPerPage}
           onChange={(e) => onItemsPerPageChange(Number(e.target.value))}
-          className="text-sm border border-zinc-300 dark:border-zinc-600 rounded-lg px-3 py-1.5 shadow-sm text-black dark:text-zinc-100 bg-white dark:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-orange-400"
+          aria-label="Itens por página"
+          className={campoClass}
         >
           <option value={10}>10 por página</option>
           <option value={50}>50 por página</option>
@@ -235,16 +349,20 @@ export function AvaliacoesTable({
 
         <button
           onClick={exportarCSV}
-          className="flex items-center gap-2 text-xs font-medium px-3 py-1.5 bg-green-600 text-white rounded-lg shadow-sm hover:bg-green-700 hover:shadow-md active:scale-95 transition-all duration-200"
+          disabled={allData.length === 0}
+          className="flex items-center gap-2 text-xs font-medium px-3 py-1.5 bg-green-600 text-white rounded-lg shadow-sm hover:bg-green-700 hover:shadow-md active:scale-95 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-green-600 disabled:hover:shadow-sm disabled:active:scale-100"
         >
-          📥 Exportar CSV
+          <Download size={14} aria-hidden="true" />
+          {selectedIds.length > 0
+            ? `Exportar selecionados (${selectedIds.length})`
+            : "Exportar CSV"}
         </button>
       </div>
 
       <div className="flex flex-col gap-3 sm:hidden">
         {data.length === 0 ? (
           <p className="text-center py-10 text-zinc-500 dark:text-zinc-400 text-sm">
-            Nenhuma avaliação encontrada.
+            {nenhumResultado}
           </p>
         ) : (
           data.map((a) => {
@@ -306,31 +424,17 @@ export function AvaliacoesTable({
                   type="checkbox"
                   checked={todosSelecionados}
                   onChange={toggleSelectAll}
+                  aria-label="Selecionar todos os resultados (todas as páginas)"
                   title="Selecionar todos os resultados (todas as páginas)"
                 />
               </th>
               <th className="px-4 py-3 text-white text-xs">#</th>
-              <th
-                onClick={() => onSort("nomefilial")}
-                className="cursor-pointer px-4 py-3 text-xs font-semibold uppercase tracking-wide text-white/90 text-left"
-              >
-                Loja {indicadorOrdem("nomefilial")}
-              </th>
-              <th
-                onClick={() => onSort("nota")}
-                className="cursor-pointer px-4 py-3 text-xs font-semibold uppercase tracking-wide text-white/90 text-left"
-              >
-                Nota {indicadorOrdem("nota")}
-              </th>
+              {cabecalhoOrdenavel("nomefilial", "Loja")}
+              {cabecalhoOrdenavel("nota", "Nota")}
               <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-white/90 text-left">
                 Comentário
               </th>
-              <th
-                onClick={() => onSort("data")}
-                className="cursor-pointer px-4 py-3 text-xs font-semibold uppercase tracking-wide text-white/90 text-left"
-              >
-                Data {indicadorOrdem("data")}
-              </th>
+              {cabecalhoOrdenavel("data", "Data")}
               <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-white/90 text-left">
                 Hora
               </th>
@@ -343,7 +447,7 @@ export function AvaliacoesTable({
                   colSpan={7}
                   className="text-center py-10 text-zinc-500 dark:text-zinc-400 text-sm"
                 >
-                  Nenhuma avaliação encontrada.
+                  {nenhumResultado}
                 </td>
               </tr>
             ) : (
@@ -363,6 +467,7 @@ export function AvaliacoesTable({
                         type="checkbox"
                         checked={selectedIds.includes(a.id)}
                         onChange={() => toggleSelect(a.id)}
+                        aria-label={`Selecionar avaliação ${a.id}`}
                       />
                     </td>
                     <td className="px-4 py-3 text-zinc-600 dark:text-zinc-400">{a.id}</td>

@@ -28,13 +28,6 @@ export function useAvaliacao(lojaId: number) {
     }
   }, [lojaId, nota, comentario]);
 
-  const reset = useCallback(() => {
-    setNota(0);
-    setComentario("");
-    setStatus("idle");
-    setErrorMsg("");
-  }, []);
-
   return {
     nota,
     setNota,
@@ -43,6 +36,5 @@ export function useAvaliacao(lojaId: number) {
     status,
     errorMsg,
     submit,
-    reset,
   };
 }

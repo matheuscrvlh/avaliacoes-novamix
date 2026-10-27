@@ -16,7 +16,6 @@ export default function AvaliacaoPage() {
     status,
     errorMsg,
     submit,
-    reset,
   } = useAvaliacao(loja?.id ?? 0);
 
   const params = new URLSearchParams(window.location.search);
@@ -27,7 +26,7 @@ export default function AvaliacaoPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-novamix-berylline p-4">
       {status === "success" ? (
-        <AvaliacaoSucesso onReset={reset} nota={nota} lojaId={loja.id} />
+        <AvaliacaoSucesso nota={nota} lojaId={loja.id} />
       ) : (
         <AvaliacaoForm
           nomeLoja={loja.nome}

@@ -27,12 +27,5 @@ export function useTelevendasAvaliacao() {
     }
   }, [nota, comentario]);
 
-  const reset = useCallback(() => {
-    setNota(0);
-    setComentario("");
-    setStatus("idle");
-    setErrorMsg("");
-  }, []);
-
-  return { nota, setNota, comentario, setComentario, status, errorMsg, submit, reset };
+  return { nota, setNota, comentario, setComentario, status, errorMsg, submit };
 }

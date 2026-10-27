@@ -3,6 +3,8 @@ import { MetricCard } from "./dashboard/components/MetricCard";
 import { LojaCard } from "./dashboard/components/LojaCard";
 import { DistribuicaoBar } from "./dashboard/components/DistribuicaoBar";
 import { AvaliacoesTable } from "./dashboard/components/AvaliacoesTable";
+import { DashboardSkeleton } from "./dashboard/components/DashboardSkeleton";
+import { ErroCarregamento } from "./dashboard/components/ErroCarregamento";
 import { Footer } from "./dashboard/components/Footer";
 import { Sidebar } from "./dashboard/components/Sidebar";
 import { motion } from "framer-motion";
@@ -18,6 +20,7 @@ export default function DashboardPage() {
     avaliacoes,
     loading,
     error,
+    reload,
     activeTab,
     handleTabChange,
     lojas,
@@ -28,6 +31,9 @@ export default function DashboardPage() {
     filterLoja,
     filterNota,
     filterPeriodo,
+    dataInicio,
+    dataFim,
+    filterBusca,
     sortField,
     sortDirection,
     page,
@@ -38,31 +44,13 @@ export default function DashboardPage() {
     handleFilterLoja,
     handleFilterNota,
     handleFilterPeriodo,
+    handleDataInicio,
+    handleDataFim,
+    handleFilterBusca,
+    handleLimparFiltros,
     handlePageChange,
     handleDelete,
   } = useDashboard();
-
-  if (loading) {
-    return (
-      <div className="flex w-full min-h-screen bg-[#f5f5f5] dark:bg-zinc-900">
-        <Sidebar activeTab={activeTab} onTabChange={handleTabChange} />
-        <main className="flex-1 min-w-0 flex items-center justify-center lg:ml-64">
-          <span className="text-sm text-zinc-500 dark:text-zinc-400">Carregando avaliações...</span>
-        </main>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="flex w-full min-h-screen bg-[#f5f5f5] dark:bg-zinc-900">
-        <Sidebar activeTab={activeTab} onTabChange={handleTabChange} />
-        <main className="flex-1 min-w-0 flex items-center justify-center lg:ml-64">
-          <span className="text-sm text-red-500">{error}</span>
-        </main>
-      </div>
-    );
-  }
 
   return (
     <div className="flex w-full min-h-screen bg-[#f5f5f5] dark:bg-zinc-900">
@@ -98,84 +86,102 @@ export default function DashboardPage() {
             </div>
 
             <div className="flex items-center gap-4">
-              <div className="text-right">
-                <p className="text-2xl font-bold text-orange-500">
-                  {metrics?.total || 0}
-                </p>
-                <p className="text-xs text-zinc-500 dark:text-zinc-400">avaliações</p>
-              </div>
+              {!loading && !error && (
+                <div className="text-right">
+                  <p className="text-2xl font-bold text-orange-500">
+                    {metrics.total}
+                  </p>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400">avaliações</p>
+                </div>
+              )}
 
               <button
                 onClick={toggle}
                 className="flex items-center gap-2 text-xs font-medium px-3 py-2 rounded-lg border border-zinc-200 dark:border-zinc-600 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors"
                 title={dark ? "Modo claro" : "Modo escuro"}
+                aria-label={dark ? "Ativar modo claro" : "Ativar modo escuro"}
               >
                 {dark ? <Sun size={14} /> : <Moon size={14} />}
               </button>
             </div>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <MetricCard label="Total de avaliações" value={metrics?.total || 0} />
-            <MetricCard
-              label="Nota média"
-              value={metrics.media === null ? "—" : metrics.media.toFixed(1)}
-              sub="de 5.0"
-            />
-            <MetricCard
-              label="Notas máximas (5★)"
-              value={`${metrics?.pct5 || 0}%`}
-            />
-            <MetricCard
-              label="Com comentário"
-              value={metrics?.withComment || 0}
-              sub={`de ${metrics?.total || 0}`}
-            />
-          </div>
-
-          {activeTab === "loja" && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {(lojas || []).map(([id, nome]) => (
-                <LojaCard
-                  key={id}
-                  idfilial={id}
-                  nome={nome}
-                  avaliacoes={(avaliacoes || []).filter(
-                    (a) => a.idfilial === id && a.tipo === "loja",
-                  )}
+          {loading ? (
+            <DashboardSkeleton mostrarLojas={activeTab === "loja"} />
+          ) : error ? (
+            <ErroCarregamento mensagem={error} onTentarNovamente={reload} />
+          ) : (
+            <>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <MetricCard label="Total de avaliações" value={metrics.total} />
+                <MetricCard
+                  label="Nota média"
+                  value={metrics.media === null ? "—" : metrics.media.toFixed(1)}
+                  sub="de 5.0"
                 />
-              ))}
-            </div>
+                <MetricCard
+                  label="Notas máximas (5★)"
+                  value={`${metrics.pct5}%`}
+                />
+                <MetricCard
+                  label="Com comentário"
+                  value={metrics.withComment}
+                  sub={`de ${metrics.total}`}
+                />
+              </div>
+
+              {activeTab === "loja" && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {lojas.map(([id, nome]) => (
+                    <LojaCard
+                      key={id}
+                      idfilial={id}
+                      nome={nome}
+                      avaliacoes={avaliacoes.filter(
+                        (a) => a.idfilial === id && a.tipo === "loja",
+                      )}
+                    />
+                  ))}
+                </div>
+              )}
+
+              <div className="bg-white dark:bg-zinc-800 p-4 rounded-xl shadow-sm border border-zinc-200 dark:border-zinc-700">
+                <DistribuicaoBar data={distribuicao} />
+              </div>
+
+              <div className="bg-white dark:bg-zinc-800 p-4 rounded-xl shadow-sm border border-zinc-200 dark:border-zinc-700">
+                <AvaliacoesTable
+                  data={pageData}
+                  allData={sortedData}
+                  lojas={lojas}
+                  filterLoja={filterLoja}
+                  filterNota={filterNota}
+                  filterPeriodo={filterPeriodo}
+                  dataInicio={dataInicio}
+                  dataFim={dataFim}
+                  filterBusca={filterBusca}
+                  sortField={sortField}
+                  sortDirection={sortDirection}
+                  onSort={handleSort}
+                  page={page}
+                  totalPages={totalPages}
+                  itemsPerPage={itemsPerPage}
+                  onItemsPerPageChange={handleItemsPerPageChange}
+                  onFilterLoja={handleFilterLoja}
+                  onFilterNota={handleFilterNota}
+                  onFilterPeriodo={handleFilterPeriodo}
+                  onDataInicio={handleDataInicio}
+                  onDataFim={handleDataFim}
+                  onFilterBusca={handleFilterBusca}
+                  onClearFilters={handleLimparFiltros}
+                  onPageChange={handlePageChange}
+                  onDelete={handleDelete}
+                  showLojaFilter={activeTab === "loja"}
+                  canDelete={isAdmin}
+                />
+              </div>
+            </>
           )}
-
-          <div className="bg-white dark:bg-zinc-800 p-4 rounded-xl shadow-sm border border-zinc-200 dark:border-zinc-700">
-            <DistribuicaoBar data={distribuicao || []} />
-          </div>
-
-          <div className="bg-white dark:bg-zinc-800 p-4 rounded-xl shadow-sm border border-zinc-200 dark:border-zinc-700">
-            <AvaliacoesTable
-              data={pageData}
-              allData={sortedData}
-              lojas={lojas || []}
-              filterLoja={filterLoja}
-              filterNota={filterNota}
-              filterPeriodo={filterPeriodo}
-              sortField={sortField}
-              sortDirection={sortDirection}
-              onSort={handleSort}
-              page={page}
-              totalPages={totalPages}
-              itemsPerPage={itemsPerPage}
-              onItemsPerPageChange={handleItemsPerPageChange}
-              onFilterLoja={handleFilterLoja}
-              onFilterNota={handleFilterNota}
-              onFilterPeriodo={handleFilterPeriodo}
-              onPageChange={handlePageChange}
-              onDelete={handleDelete}
-              showLojaFilter={activeTab === "loja"}
-              canDelete={isAdmin}
-            />
-          </div>
         </motion.section>
 
         <div className="pb-6">

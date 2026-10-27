@@ -11,13 +11,12 @@ export default function TelevendasPage() {
     status,
     errorMsg,
     submit,
-    reset,
   } = useTelevendasAvaliacao();
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-novamix-berylline p-4">
       {status === "success" ? (
-        <AvaliacaoSucesso onReset={reset} nota={nota} />
+        <AvaliacaoSucesso nota={nota} />
       ) : (
         <AvaliacaoForm
           nomeLoja="Televendas"
