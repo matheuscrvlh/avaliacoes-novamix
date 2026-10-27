@@ -1,9 +1,12 @@
 import { useEffect, useState, useMemo } from "react";
 import { getAvaliacoes, deleteAvaliacao } from "../../../../lib/api";
+import { TELEVENDAS_ID } from "@/types/avaliacao";
 import { Avaliacao } from "../types/avaliacao";
 
 export type DashboardTab = "loja" | "televendas";
 export type PeriodoFiltro = "all" | "dia" | "semana" | "mes";
+export type SortField = "nomefilial" | "nota" | "data";
+export type SortDirection = "asc" | "desc";
 
 const TIMEZONE = "America/Sao_Paulo";
 
@@ -69,6 +72,8 @@ export function useDashboard() {
   const [filterPeriodo, setFilterPeriodo] = useState<PeriodoFiltro>("all");
   const [page, setPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [sortField, setSortField] = useState<SortField | null>(null);
+  const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
 
   useEffect(() => {
     async function fetchAvaliacoes() {
@@ -77,15 +82,18 @@ export function useDashboard() {
         setError(null);
         const res = await getAvaliacoes();
 
-        const dadosFormatados = res.map((a: any) => ({
-          id: a.id,
-          idfilial: a.idfilial,
-          nomefilial: a.nomefilial,
-          nota: a.nota,
-          comentario: a.comentario,
-          data: a.data,
-          tipo: a.nomefilial === "Televendas" ? "televendas" : "loja",
-        }));
+        const dadosFormatados: Avaliacao[] = res.map((a) => {
+          const idfilial = Number(a.idfilial);
+          return {
+            id: Number(a.id),
+            idfilial,
+            nomefilial: a.nomefilial,
+            nota: Number(a.nota),
+            comentario: a.comentario,
+            data: a.data,
+            tipo: idfilial === TELEVENDAS_ID ? "televendas" : "loja",
+          };
+        });
 
         setAvaliacoes(dadosFormatados);
       } catch {
@@ -111,12 +119,10 @@ export function useDashboard() {
   const metrics = useMemo(() => {
     const total = tabData.length;
     const media = total
-      ? (tabData.reduce((s, a) => s + Number(a.nota), 0) / total).toFixed(1)
-      : "—";
+      ? tabData.reduce((s, a) => s + a.nota, 0) / total
+      : null;
     const pct5 = total
-      ? Math.round(
-          (tabData.filter((a) => Number(a.nota) === 5).length / total) * 100,
-        )
+      ? Math.round((tabData.filter((a) => a.nota === 5).length / total) * 100)
       : 0;
     const withComment = tabData.filter((a) => a.comentario?.trim()).length;
     return { total, media, pct5, withComment };
@@ -126,7 +132,7 @@ export function useDashboard() {
     () =>
       [5, 4, 3, 2, 1].map((nota) => ({
         nota,
-        count: tabData.filter((a) => Number(a.nota) === nota).length,
+        count: tabData.filter((a) => a.nota === nota).length,
       })),
     [tabData],
   );
@@ -143,10 +149,28 @@ export function useDashboard() {
     [tabData, filterLoja, filterNota, filterPeriodo],
   );
 
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-  const pageData = filteredData.slice(
-    (page - 1) * itemsPerPage,
-    page * itemsPerPage,
+  const sortedData = useMemo(() => {
+    if (!sortField) return filteredData;
+
+    const direcao = sortDirection === "asc" ? 1 : -1;
+
+    return [...filteredData].sort((a, b) => {
+      if (sortField === "nomefilial") {
+        return direcao * a.nomefilial.localeCompare(b.nomefilial);
+      }
+      if (sortField === "nota") {
+        return direcao * (a.nota - b.nota);
+      }
+      return direcao * (new Date(a.data).getTime() - new Date(b.data).getTime());
+    });
+  }, [filteredData, sortField, sortDirection]);
+
+  const totalPages = Math.ceil(sortedData.length / itemsPerPage);
+  // Após excluir itens a página salva pode deixar de existir
+  const currentPage = Math.min(page, Math.max(totalPages, 1));
+  const pageData = sortedData.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage,
   );
 
   function handleTabChange(tab: DashboardTab) {
@@ -154,6 +178,16 @@ export function useDashboard() {
     setFilterLoja("all");
     setFilterNota("all");
     setFilterPeriodo("all");
+    setPage(1);
+  }
+
+  function handleSort(field: SortField) {
+    if (sortField === field) {
+      setSortDirection((d) => (d === "asc" ? "desc" : "asc"));
+    } else {
+      setSortField(field);
+      setSortDirection("asc");
+    }
     setPage(1);
   }
 
@@ -192,16 +226,18 @@ export function useDashboard() {
     lojas,
     metrics,
     distribuicao,
-    filteredData,
+    sortedData,
     pageData,
     filterLoja,
     filterNota,
     filterPeriodo,
-    page,
+    sortField,
+    sortDirection,
+    page: currentPage,
     totalPages,
     itemsPerPage,
-    setItemsPerPage,
     handleItemsPerPageChange,
+    handleSort,
     handleFilterLoja,
     handleFilterNota,
     handleFilterPeriodo,

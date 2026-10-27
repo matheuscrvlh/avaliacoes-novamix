@@ -1,16 +1,18 @@
+import { LOJAS } from "@/types/avaliacao";
+
 interface AvaliacaoSucessoProps {
   onReset: () => void;
   nota: number;
   lojaId?: number;
 }
 
-import { googleLinks } from "@/pages/admin/constants";
-
 export default function AvaliacaoSucesso({
   onReset,
   nota,
   lojaId,
 }: AvaliacaoSucessoProps) {
+  const googleLink = lojaId !== undefined ? LOJAS[lojaId]?.googleLink : undefined;
+
   return (
     <div className="bg-white rounded-3xl shadow-xl px-10 py-12 max-w-md w-full text-center">
       <div className="mx-auto mb-6 w-20 h-20 rounded-full bg-novamix-teal/10 flex items-center justify-center animate-bounce-in">
@@ -38,9 +40,9 @@ export default function AvaliacaoSucesso({
       </p>
 
       <div className="flex flex-col items-center gap-3">
-        {nota === 5 && lojaId !== undefined && googleLinks[lojaId] && (
+        {nota === 5 && googleLink && (
           <a
-            href={googleLinks[lojaId]}
+            href={googleLink}
             target="_blank"
             rel="noreferrer"
             className="inline-block bg-green-500 hover:bg-green-600 text-white text-sm font-semibold px-4 py-2 rounded-lg"

@@ -1,16 +1,22 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Avaliacao } from "../types/avaliacao";
-import { PeriodoFiltro } from "../hooks/useDashBoard";
+import { PeriodoFiltro, SortDirection, SortField } from "../hooks/useDashBoard";
 import { NotaBadge } from "./NotaBadge";
 import { ConfirmDeleteModal } from "./ConfirmDeleteModal";
+import { baixarCSV } from "../../../../lib/csv";
 
 interface AvaliacoesTableProps {
+  /** Linhas da página atual */
   data: Avaliacao[];
-  totalFiltered: number;
+  /** Todas as linhas que passam pelos filtros, já ordenadas (todas as páginas) */
+  allData: Avaliacao[];
   lojas: [number, string][];
   filterLoja: string;
   filterNota: string;
   filterPeriodo: PeriodoFiltro;
+  sortField: SortField | null;
+  sortDirection: SortDirection;
+  onSort: (field: SortField) => void;
   page: number;
   totalPages: number;
   itemsPerPage: number;
@@ -44,11 +50,14 @@ function formatarDataHora(valor: string | null | undefined) {
 
 export function AvaliacoesTable({
   data,
-  totalFiltered,
+  allData,
   lojas,
   filterLoja,
   filterNota,
   filterPeriodo,
+  sortField,
+  sortDirection,
+  onSort,
   page,
   totalPages,
   itemsPerPage,
@@ -64,50 +73,37 @@ export function AvaliacoesTable({
   const hasFilters =
     filterLoja !== "all" || filterNota !== "all" || filterPeriodo !== "all";
 
-  const [sortField, setSortField] = useState<string | null>(null);
-  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const [deleting, setDeleting] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [rawSelectedIds, setRawSelectedIds] = useState<number[]>([]);
 
-  function handleSort(field: string) {
-    if (sortField === field) {
-      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
-    } else {
-      setSortField(field);
-      setSortDirection("asc");
-    }
-  }
+  // Ignora seleções que saíram do resultado (filtro alterado, aba trocada),
+  // para nunca excluir/exportar linhas que o usuário não está vendo.
+  const selectedIds = useMemo(() => {
+    const visiveis = new Set(allData.map((a) => a.id));
+    return rawSelectedIds.filter((id) => visiveis.has(id));
+  }, [rawSelectedIds, allData]);
 
-  const sortedData = [...data].sort((a, b) => {
-    if (!sortField) return 0;
-    const aValue = a[sortField as keyof Avaliacao];
-    const bValue = b[sortField as keyof Avaliacao];
-    if (aValue < bValue) return sortDirection === "asc" ? -1 : 1;
-    if (aValue > bValue) return sortDirection === "asc" ? 1 : -1;
-    return 0;
-  });
-
-  const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const todosSelecionados =
+    allData.length > 0 && selectedIds.length === allData.length;
 
   function toggleSelect(id: number) {
-    setSelectedIds((prev) =>
-      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id],
+    setRawSelectedIds(
+      selectedIds.includes(id)
+        ? selectedIds.filter((i) => i !== id)
+        : [...selectedIds, id],
     );
   }
 
   function toggleSelectAll() {
-    if (selectedIds.length === sortedData.length) {
-      setSelectedIds([]);
-    } else {
-      setSelectedIds(sortedData.map((a) => a.id));
-    }
+    setRawSelectedIds(todosSelecionados ? [] : allData.map((a) => a.id));
   }
 
   async function handleDeleteConfirm() {
     setDeleting(true);
     try {
       await onDelete(selectedIds);
-      setSelectedIds([]);
+      setRawSelectedIds([]);
       setShowConfirm(false);
     } finally {
       setDeleting(false);
@@ -117,34 +113,21 @@ export function AvaliacoesTable({
   function exportarCSV() {
     const dadosParaExportar =
       selectedIds.length > 0
-        ? sortedData.filter((a) => selectedIds.includes(a.id))
-        : sortedData;
+        ? allData.filter((a) => selectedIds.includes(a.id))
+        : allData;
 
     const cabecalho = ["ID", "Loja", "Nota", "Comentário", "Data", "Hora"];
     const linhas = dadosParaExportar.map((a) => {
       const { data: d, hora: h } = formatarDataHora(a.data);
-      return [
-        a.id,
-        a.nomefilial,
-        a.nota,
-        a.comentario?.replace(/,/g, " "),
-        d,
-        h,
-      ];
+      return [a.id, a.nomefilial, a.nota, a.comentario, d, h];
     });
 
-    const csvContent = [cabecalho, ...linhas]
-      .map((e) => e.join(","))
-      .join("\n");
+    baixarCSV("avaliacoes.csv", cabecalho, linhas);
+  }
 
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.setAttribute("download", "avaliacoes.csv");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  function indicadorOrdem(field: SortField) {
+    if (sortField !== field) return null;
+    return sortDirection === "asc" ? "↑" : "↓";
   }
 
   return (
@@ -259,12 +242,12 @@ export function AvaliacoesTable({
       </div>
 
       <div className="flex flex-col gap-3 sm:hidden">
-        {sortedData.length === 0 ? (
+        {data.length === 0 ? (
           <p className="text-center py-10 text-zinc-500 dark:text-zinc-400 text-sm">
             Nenhuma avaliação encontrada.
           </p>
         ) : (
-          sortedData.map((a) => {
+          data.map((a) => {
             const { data: d, hora: h } = formatarDataHora(a.data);
             return (
               <div
@@ -321,38 +304,32 @@ export function AvaliacoesTable({
               <th className="px-4 py-3">
                 <input
                   type="checkbox"
-                  checked={
-                    selectedIds.length === sortedData.length &&
-                    sortedData.length > 0
-                  }
+                  checked={todosSelecionados}
                   onChange={toggleSelectAll}
+                  title="Selecionar todos os resultados (todas as páginas)"
                 />
               </th>
               <th className="px-4 py-3 text-white text-xs">#</th>
               <th
-                onClick={() => handleSort("nomefilial")}
+                onClick={() => onSort("nomefilial")}
                 className="cursor-pointer px-4 py-3 text-xs font-semibold uppercase tracking-wide text-white/90 text-left"
               >
-                Loja{" "}
-                {sortField === "nomefilial" &&
-                  (sortDirection === "asc" ? "↑" : "↓")}
+                Loja {indicadorOrdem("nomefilial")}
               </th>
               <th
-                onClick={() => handleSort("nota")}
+                onClick={() => onSort("nota")}
                 className="cursor-pointer px-4 py-3 text-xs font-semibold uppercase tracking-wide text-white/90 text-left"
               >
-                Nota{" "}
-                {sortField === "nota" && (sortDirection === "asc" ? "↑" : "↓")}
+                Nota {indicadorOrdem("nota")}
               </th>
               <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-white/90 text-left">
                 Comentário
               </th>
               <th
-                onClick={() => handleSort("data")}
+                onClick={() => onSort("data")}
                 className="cursor-pointer px-4 py-3 text-xs font-semibold uppercase tracking-wide text-white/90 text-left"
               >
-                Data{" "}
-                {sortField === "data" && (sortDirection === "asc" ? "↑" : "↓")}
+                Data {indicadorOrdem("data")}
               </th>
               <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-white/90 text-left">
                 Hora
@@ -360,7 +337,7 @@ export function AvaliacoesTable({
             </tr>
           </thead>
           <tbody className="divide-y divide-zinc-200 dark:divide-zinc-700">
-            {sortedData.length === 0 ? (
+            {data.length === 0 ? (
               <tr>
                 <td
                   colSpan={7}
@@ -370,7 +347,7 @@ export function AvaliacoesTable({
                 </td>
               </tr>
             ) : (
-              sortedData.map((a, index) => {
+              data.map((a, index) => {
                 const { data: d, hora: h } = formatarDataHora(a.data);
                 return (
                   <tr
@@ -415,7 +392,7 @@ export function AvaliacoesTable({
       {totalPages > 1 && (
         <div className="flex items-center justify-between mt-3">
           <span className="text-xs text-zinc-500 dark:text-zinc-400">
-            {totalFiltered} resultado{totalFiltered !== 1 ? "s" : ""}
+            {allData.length} resultado{allData.length !== 1 ? "s" : ""}
           </span>
           <div className="flex items-center gap-2">
             <button

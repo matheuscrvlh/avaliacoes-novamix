@@ -9,9 +9,9 @@ if (!JWT_SECRET) {
   console.error("[auth] ERRO: JWT_SECRET não definido no .env");
 }
 
+const { PRADO_ID, TELEVENDAS_ID } = require("../lojas");
+
 const AVALIACOES_MODULE = "avaliacoes";
-const PRADO_ID = 1;
-const TELEVENDAS_ID = 5;
 
 function autenticar(req, res, next) {
   const authHeader = req.headers.authorization;

@@ -23,15 +23,18 @@ export default function DashboardPage() {
     lojas,
     metrics,
     distribuicao,
-    filteredData,
+    sortedData,
     pageData,
     filterLoja,
     filterNota,
     filterPeriodo,
+    sortField,
+    sortDirection,
     page,
     totalPages,
     itemsPerPage,
     handleItemsPerPageChange,
+    handleSort,
     handleFilterLoja,
     handleFilterNota,
     handleFilterPeriodo,
@@ -116,7 +119,7 @@ export default function DashboardPage() {
             <MetricCard label="Total de avaliações" value={metrics?.total || 0} />
             <MetricCard
               label="Nota média"
-              value={metrics?.media || 0}
+              value={metrics.media === null ? "—" : metrics.media.toFixed(1)}
               sub="de 5.0"
             />
             <MetricCard
@@ -151,12 +154,15 @@ export default function DashboardPage() {
 
           <div className="bg-white dark:bg-zinc-800 p-4 rounded-xl shadow-sm border border-zinc-200 dark:border-zinc-700">
             <AvaliacoesTable
-              data={pageData || []}
-              totalFiltered={(filteredData || []).length}
+              data={pageData}
+              allData={sortedData}
               lojas={lojas || []}
               filterLoja={filterLoja}
               filterNota={filterNota}
               filterPeriodo={filterPeriodo}
+              sortField={sortField}
+              sortDirection={sortDirection}
+              onSort={handleSort}
               page={page}
               totalPages={totalPages}
               itemsPerPage={itemsPerPage}

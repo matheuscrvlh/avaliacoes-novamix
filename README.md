@@ -1,51 +1,33 @@
 # ⭐ Sistema de Avaliações - Novamix Food Service
 
-Sistema completo de avaliações desenvolvido para a **Novamix Food Service**, permitindo que clientes avaliem o atendimento das lojas através de um formulário simples e intuitivo.
-
-O projeto possui:
+Sistema de avaliações de atendimento da **Novamix Food Service**. Os clientes avaliam as lojas e o Televendas por um formulário simples, e a equipe acompanha os resultados em um dashboard administrativo.
 
 - ✅ Área pública para clientes enviarem avaliações
-- ✅ Dashboard administrativo
-- ✅ Sistema de autenticação
-- ✅ Filtros avançados
+- ✅ Dashboard administrativo (acesso via Hub)
+- ✅ Filtros por loja, nota e período (hoje, semana, mês)
+- ✅ Ordenação, paginação e seleção múltipla
 - ✅ Exportação CSV
-- ✅ Paginação
 - ✅ Dark Mode
-- ✅ Integração com avaliação no Google
-- ✅ Responsividade Mobile/Desktop
+- ✅ Redirecionamento para avaliação no Google em notas 5★
+- ✅ Responsivo (mobile/desktop)
 
 ---
 
-# 📸 Preview
+# 🔗 Links
 
-## Tela de Avaliação
+- Área do cliente: https://avaliacoes.lojanovamix.com.br/?loja=1
+- Televendas: https://avaliacoes.lojanovamix.com.br/televendas
+- Dashboard: https://avaliacoes.lojanovamix.com.br/dashboard
 
-![Preview Avaliação](./screenshots/avaliacao.png)
+O parâmetro `?loja=` identifica a filial avaliada. Sem ele, o cliente escolhe a filial numa tela de seleção.
 
----
-
-## Dashboard Administrativo
-
-![Preview Dashboard](./screenshots/dashboard.png)
-![Preview Dashboard](./screenshots/dashboard2.png)
-
----
-
-## Mobile
-
-<p align="center">
-  <img src="./screenshots/mobile.png" alt="Preview Mobile" width="300" />
-</p>
-
----
-
-# 🚀 Link do Projeto
-
-### Área pública do cliente
-
-🔗 https://avaliacoes.lojanovamix.com.br/?loja=1
-
-> O parâmetro `?loja=1` identifica automaticamente qual filial está sendo avaliada.
+| ID | Filial |
+| -- | ------ |
+| 1 | Prado |
+| 2 | Centro |
+| 3 | Olaria |
+| 4 | Teresópolis |
+| 5 | Televendas |
 
 ---
 
@@ -54,203 +36,133 @@ O projeto possui:
 ## 👤 Área do Cliente
 
 - Avaliação de 1 a 5 estrelas
-- Comentário opcional
-- Feedback visual animado
-- Redirecionamento para avaliação no Google ao enviar 5 estrelas
-- Identificação automática da loja via URL
-- Layout responsivo
-- Interface moderna e intuitiva
+- Comentário opcional (até 500 caracteres)
+- Identificação da loja via URL
+- Link para avaliar no Google ao enviar 5 estrelas (lojas 1 a 4)
+
+## 🔐 Dashboard
+
+- Acesso protegido: não existe login neste sistema, a sessão vem do **Hub** (`hub.lojanovamix.com.br`). Sem sessão válida, o usuário é redirecionado para o Hub.
+- Abas **Lojas** e **Televendas**
+- Métricas (total, nota média, % de notas 5, comentários), cards por loja e distribuição de notas
+- Filtros por loja, nota e período (fuso `America/Sao_Paulo`)
+- Ordenação por loja, nota e data (vale para todos os resultados, não só a página atual)
+- Seleção múltipla (o checkbox do cabeçalho seleciona todos os resultados filtrados, em todas as páginas)
+- Exclusão de avaliações (apenas admin do módulo)
+- Exportação CSV dos selecionados ou, sem seleção, de todos os resultados filtrados
 
 ---
 
-## 🔐 Área Administrativa
+# 🔑 Autenticação e permissões
 
-- Login protegido com JWT
-- Dashboard de avaliações
-- Visualização completa dos feedbacks
-- Paginação dinâmica
-- Filtros por:
-  - Loja
-  - Nota
-- Ordenação de colunas
-- Exportação CSV
-- Seleção múltipla
-- Dark Mode
+O Hub emite um JWT (cookie `token`) assinado com o `JWT_SECRET`, que este servidor apenas valida. O token traz:
 
----
+- `permissions[]`: o módulo `avaliacoes` com acesso `admin` ou outro. Sem o módulo, não há acesso.
+- `branchs[]`: filiais do usuário. Quem tem a filial 1 (Prado) também enxerga o Televendas (5).
 
-# 🛠️ Tecnologias Utilizadas
-
-## Front-end
-
-- React
-- TypeScript
-- Vite
-- TailwindCSS
+| Ação | Quem pode |
+| ---- | --------- |
+| Enviar avaliação | Público |
+| Listar avaliações (`GET /dashboard`) | Qualquer usuário com o módulo, apenas das suas filiais |
+| Excluir avaliação | Admin do módulo, apenas das suas filiais |
 
 ---
 
-## Back-end
+# 🛠️ Tecnologias
 
-- Node.js
-- Express
-- SQLite
-- JWT
-- bcryptjs
-- Docker
+**Client** (`client/`): React 18, TypeScript, Vite, TailwindCSS, framer-motion, lucide-react, react-router.
+
+**Server** (`server/`): Node.js 22, Express 5, PostgreSQL (`pg`), jsonwebtoken, cookie-parser, cors.
+
+**Infra**: Docker Compose, nginx (serve o SPA e faz proxy de `/api/` para o server).
 
 ---
 
-# 📂 Estrutura do Projeto
+# 📂 Estrutura
 
-```bash
+```
 avaliacoes-novamix/
-│
-├── backend/
-│   ├── database/
-│   ├── routes/
-│   ├── server.js
-│   ├── Dockerfile
-│   └── package.json
-│
-├── frontend/
-│   ├── public/
+├── client/
 │   ├── src/
-│   │   ├── components/
-│   │   ├── context/
+│   │   ├── components/       # formulário público e componentes de UI
+│   │   ├── context/          # AuthContext (sessão)
 │   │   ├── hooks/
-│   │   ├── lib/
+│   │   ├── lib/              # api.ts (chamadas HTTP), csv.ts
 │   │   ├── pages/
-│   │   │   ├── admin/
-│   │   │   └── public/
-│   │   ├── types/
-│   │   ├── App.tsx
-│   │   └── main.tsx
-│   │
-│   └── package.json
-│
+│   │   │   ├── admin/        # dashboard
+│   │   │   └── public/       # páginas do cliente
+│   │   └── types/            # tipos e cadastro de lojas (LOJAS)
+│   ├── nginx.conf
+│   └── Dockerfile
+├── server/
+│   ├── database/             # pool do PostgreSQL
+│   ├── middleware/           # rate limit
+│   ├── routes/               # auth, avaliacoes, dashboard
+│   ├── lojas.js              # cadastro de lojas (ids e nomes)
+│   ├── server.js
+│   └── Dockerfile
 └── docker-compose.yml
 ```
 
+> Ao adicionar ou renomear uma loja, atualize `server/lojas.js` e `client/src/types/avaliacao.ts` (`LOJAS`).
+
 ---
 
-# ⚙️ Como Rodar o Projeto
+# ⚙️ Como rodar
 
-## 📦 Clonar o repositório
+## Variáveis de ambiente
+
+Copie os exemplos e preencha:
 
 ```bash
-git clone https://github.com/seuusuario/avaliacoes-novamix.git
+cp server/.env.example server/.env
+cp client/.env.example client/.env
 ```
 
----
+| Arquivo | Variável | Descrição |
+| ------- | -------- | --------- |
+| server | `JWT_SECRET` | Mesmo segredo usado pelo Hub para assinar o JWT |
+| server | `DATABASE_URL` | Conexão PostgreSQL (SSL com validação de certificado; schema `avaliacoes`) |
+| server | `CORS_ORIGIN` | Origens permitidas, separadas por vírgula |
+| server | `TRUST_PROXY_HOPS` | Nº de proxies na frente do server (padrão `2`), usado no rate limit por IP |
+| client | `VITE_API_URL` | URL base da API |
+| client | `VITE_HUB_URL` | URL do Hub |
 
-# 🔥 Front-end
+## Desenvolvimento
 
 ```bash
-cd frontend
-
+# Server (porta 3000)
+cd server
 npm install
+npm run dev
 
+# Client (porta 5173)
+cd client
+npm install
 npm run dev
 ```
 
----
-
-# 🔥 Back-end
-
-```bash
-cd backend
-
-npm install
-
-npm run dev
-```
-
----
-
-# 🐳 Rodando com Docker
+## Docker
 
 ```bash
 docker-compose up --build
 ```
 
----
-
-# 🔐 Autenticação
-
-O sistema utiliza:
-
-- JWT para autenticação
-- bcryptjs para criptografia de senhas
-
-Rotas administrativas protegidas.
+Client em `http://localhost:8082` e server em `http://localhost:3002`.
 
 ---
 
-# 📊 Dashboard
+# 🛡️ Envio de avaliações
 
-O dashboard possui:
-
-- Estatísticas gerais
-- Média de avaliações
-- Percentual de notas 5
-- Quantidade de comentários
-- Tabela interativa
-- Filtros avançados
-- Paginação configurável
-
----
-
-# 📁 Exportação CSV
-
-As avaliações podem ser exportadas diretamente em CSV:
-
-- Todas avaliações
-- Apenas selecionadas
-- Dados filtrados
-
----
-
-# 🌙 Dark Mode
-
-O painel administrativo possui suporte a Dark Mode para melhor experiência visual.
-
----
-
-# 📱 Responsividade
-
-O sistema foi desenvolvido pensando em:
-
-- Desktop
-- Tablet
-- Mobile
-
----
-
-# 🎯 Objetivo do Projeto
-
-O principal objetivo do sistema é permitir que a Novamix acompanhe a satisfação dos clientes em tempo real, coletando feedbacks importantes para melhorar continuamente o atendimento das lojas.
+O `POST /avaliacoes/loja/:lojaId` é público, então o servidor valida: loja existente, nota inteira de 1 a 5 e comentário com até 500 caracteres. O nome da filial é definido pelo servidor, e há limite de 30 envios a cada 10 minutos por IP.
 
 ---
 
 # 👨‍💻 Desenvolvedores
 
-### Marlon Alves
-
-- Front-end Developer
-
-GitHub:
-https://github.com/marlonalvees
-
----
-
-### Matheus Carvalho
-
-GitHub:
-https://github.com/matheuscrvlh
-
----
+- **Marlon Alves** (Front-end) — https://github.com/marlonalvees
+- **Matheus Carvalho** — https://github.com/matheuscrvlh
 
 # 📄 Licença
 
-Este projeto é privado e desenvolvido exclusivamente para a Novamix Food Service.
+Projeto privado, desenvolvido exclusivamente para a Novamix Food Service.

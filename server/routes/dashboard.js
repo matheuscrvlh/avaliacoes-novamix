@@ -10,7 +10,7 @@ router.get('/', autenticar, requireAvaliacoesAccess, async (req, res) => {
 
   const placeholders = req.filiaisPermitidas.map((_, i) => `$${i + 1}`).join(', ')
   const { rows } = await pool.query(
-    `SELECT * FROM avaliacoes WHERE idfilial IN (${placeholders})`,
+    `SELECT * FROM avaliacoes WHERE idfilial IN (${placeholders}) ORDER BY data DESC`,
     req.filiaisPermitidas
   )
 

@@ -31,7 +31,6 @@ export default function AvaliacaoPage() {
       ) : (
         <AvaliacaoForm
           nomeLoja={loja.nome}
-          lojaId={loja.id}
           nota={nota}
           onNotaChange={setNota}
           comentario={comentario}
