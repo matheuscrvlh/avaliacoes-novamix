@@ -3,9 +3,11 @@ const router = express.Router()
 const pool = require('../database/database')
 const rateLimit = require('../middleware/rateLimit')
 const { LOJAS } = require('../lojas')
+const { emailConfigurado, enviarAvaliacaoBaixa } = require('../services/email')
 const { autenticar, requireAvaliacoesAccess, requireAvaliacoesAdmin } = require('./auth')
 
 const COMENTARIO_MAX = 500
+const NOTA_MINIMA_DASHBOARD = 4
 
 const limitarEnvio = rateLimit({ windowMs: 10 * 60 * 1000, max: 30 })
 
@@ -32,6 +34,20 @@ router.post('/loja/:lojaId', limitarEnvio, async (req, res) => {
   }
 
   const data = new Date().toISOString()
+
+  // Notas baixas vão por e-mail e não são gravadas (não aparecem no dashboard).
+  // Sem SMTP configurado, grava normalmente para não perder a avaliação.
+  if (nota < NOTA_MINIMA_DASHBOARD && emailConfigurado()) {
+    try {
+      await enviarAvaliacaoBaixa({ nomeLoja: LOJAS[lojaId], nota, comentario: comentarioLimpo, data })
+    } catch (err) {
+      console.error('[email] falha ao enviar avaliação com nota baixa:', err)
+      return res.status(503).json({ erro: 'Não foi possível enviar sua avaliação agora. Tente novamente.' })
+    }
+
+    return res.json({ sucesso: true })
+  }
+
   await pool.query(
     'INSERT INTO avaliacoes (idfilial, nomefilial, nota, comentario, data) VALUES ($1, $2, $3, $4, $5)',
     [lojaId, LOJAS[lojaId], nota, comentarioLimpo, data]

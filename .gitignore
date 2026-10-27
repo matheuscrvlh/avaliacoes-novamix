@@ -11,11 +11,19 @@ build/
 
 # ambiente
 .env
+.env.*
+!.env.example
+
+# chaves e certificados (ex.: CA do banco em server/certs)
+*.pem
+*.key
+certs/
 
 # banco de dados local (persistido via volume, nunca deve ir pro git)
 *.db
 
 # logs
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*

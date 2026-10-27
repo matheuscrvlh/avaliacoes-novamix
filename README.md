@@ -124,6 +124,8 @@ cp client/.env.example client/.env
 | server | `JWT_SECRET` | Mesmo segredo usado pelo Hub para assinar o JWT |
 | server | `DATABASE_URL` | Conexão PostgreSQL (SSL com validação de certificado; schema `avaliacoes`) |
 | server | `CORS_ORIGIN` | Origens permitidas, separadas por vírgula |
+| server | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM` | Servidor SMTP usado para enviar avaliações com nota baixa (porta 465 usa SSL) |
+| server | `EMAIL_AVALIACAO_DESTINO` | E-mail que recebe as avaliações com nota menor que 4 |
 | server | `TRUST_PROXY_HOPS` | Nº de proxies na frente do server (padrão `2`), usado no rate limit por IP |
 | client | `VITE_API_URL` | URL base da API |
 | client | `VITE_HUB_URL` | URL do Hub |
@@ -155,6 +157,13 @@ Client em `http://localhost:8082` e server em `http://localhost:3002`.
 # 🛡️ Envio de avaliações
 
 O `POST /avaliacoes/loja/:lojaId` é público, então o servidor valida: loja existente, nota inteira de 1 a 5 e comentário com até 500 caracteres. O nome da filial é definido pelo servidor, e há limite de 30 envios a cada 10 minutos por IP.
+
+## Notas baixas vão por e-mail
+
+Avaliações novas com nota **menor que 4** (em qualquer loja ou no Televendas) são enviadas por e-mail para `EMAIL_AVALIACAO_DESTINO` e **não são gravadas no banco**, então não aparecem no dashboard nem entram nas métricas (nota média e % de 5★ ficam acima da realidade). As avaliações antigas permanecem como estão.
+
+- Se o e-mail falhar, o cliente recebe um erro (503) e pode tentar de novo.
+- Se o SMTP não estiver configurado no `.env`, essas avaliações são gravadas no banco normalmente, para não se perderem.
 
 ---
 
