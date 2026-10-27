@@ -48,6 +48,7 @@ O parâmetro `?loja=` identifica a filial avaliada. Sem ele, o cliente escolhe a
 - Filtros por loja, nota, período (hoje, semana, mês ou intervalo de datas, no fuso `America/Sao_Paulo`) e busca por texto nos comentários (ignora acentos e maiúsculas)
 - Filtros, ordenação e página ficam na URL, então atualizar a página (F5) ou compartilhar o link mantém a visão
 - Ordenação por loja, nota e data (vale para todos os resultados, não só a página atual), com cabeçalhos acessíveis por teclado
+- No celular, tocar em uma avaliação abre uma prévia flutuante (estilo "peek" do iPhone) com o comentário completo; o checkbox do card continua selecionando sem abrir a prévia
 - Esqueleto de carregamento e botão "Tentar de novo" quando a API falha
 - Seleção múltipla (o checkbox do cabeçalho seleciona todos os resultados filtrados, em todas as páginas)
 - Exclusão de avaliações (apenas admin do módulo)

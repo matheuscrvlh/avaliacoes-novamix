@@ -4,6 +4,8 @@ import { Avaliacao } from "../types/avaliacao";
 import { PeriodoFiltro, SortDirection, SortField } from "../hooks/useDashBoard";
 import { NotaBadge } from "./NotaBadge";
 import { ConfirmDeleteModal } from "./ConfirmDeleteModal";
+import { AvaliacaoPeekModal } from "./AvaliacaoPeekModal";
+import { formatarDataHora } from "../utils/formatarDataHora";
 import { baixarCSV } from "../../../../lib/csv";
 
 interface AvaliacoesTableProps {
@@ -36,24 +38,6 @@ interface AvaliacoesTableProps {
   onDelete: (ids: number[]) => Promise<void>;
   showLojaFilter?: boolean;
   canDelete?: boolean;
-}
-
-function formatarDataHora(valor: string | null | undefined) {
-  if (!valor) return { data: "—", hora: "—" };
-
-  const date = new Date(valor)
-
-  const data = date.toLocaleDateString("pt-BR", {
-    timeZone: "America/Sao_Paulo",
-  });
-
-  const hora = date.toLocaleTimeString("pt-BR", {
-    timeZone: "America/Sao_Paulo",
-    hour: "2-digit",
-    minute: "2-digit"
-  })
-
-  return { data, hora };
 }
 
 const campoClass =
@@ -97,6 +81,13 @@ export function AvaliacoesTable({
   const [deleting, setDeleting] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [rawSelectedIds, setRawSelectedIds] = useState<number[]>([]);
+
+  // Prévia (celular): avaliação aberta e de onde na tela ela "nasce".
+  // Se a avaliação sair do resultado (excluída, filtro alterado), a prévia fecha sozinha.
+  const [peek, setPeek] = useState<{ id: number; origemY: number } | null>(null);
+  const peekAvaliacao = peek
+    ? (allData.find((a) => a.id === peek.id) ?? null)
+    : null;
 
   // O campo de busca é local e só atualiza a URL depois que a pessoa para de digitar
   const [buscaLocal, setBuscaLocal] = useState(filterBusca);
@@ -370,9 +361,24 @@ export function AvaliacoesTable({
             return (
               <div
                 key={a.id}
-                onClick={() => toggleSelect(a.id)}
+                role="button"
+                tabIndex={0}
+                aria-label={`Abrir avaliação ${a.id} de ${a.nomefilial}`}
+                onClick={(e) => {
+                  const r = e.currentTarget.getBoundingClientRect();
+                  setPeek({
+                    id: a.id,
+                    origemY: r.top + r.height / 2 - window.innerHeight / 2,
+                  });
+                }}
+                onKeyDown={(e) => {
+                  if (e.target === e.currentTarget && (e.key === "Enter" || e.key === " ")) {
+                    e.preventDefault();
+                    e.currentTarget.click();
+                  }
+                }}
                 className={`
-                  border rounded-xl p-4 flex flex-col gap-2 cursor-pointer transition-colors
+                  border rounded-xl p-4 flex flex-col gap-2 cursor-pointer transition-all duration-150 active:scale-[0.98]
                   ${
                     selectedIds.includes(a.id)
                       ? "bg-orange-50 dark:bg-orange-900/20 border-orange-300 dark:border-orange-700"
@@ -382,13 +388,19 @@ export function AvaliacoesTable({
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      checked={selectedIds.includes(a.id)}
-                      onChange={() => toggleSelect(a.id)}
+                    {/* Área de toque maior; selecionar não abre a prévia */}
+                    <label
+                      className="-m-2 flex items-center p-2"
                       onClick={(e) => e.stopPropagation()}
-                      className="accent-orange-500"
-                    />
+                    >
+                      <input
+                        type="checkbox"
+                        checked={selectedIds.includes(a.id)}
+                        onChange={() => toggleSelect(a.id)}
+                        aria-label={`Selecionar avaliação ${a.id}`}
+                        className="accent-orange-500"
+                      />
+                    </label>
                     <span className="font-semibold text-sm text-black dark:text-zinc-100">
                       {a.nomefilial}
                     </span>
@@ -414,6 +426,14 @@ export function AvaliacoesTable({
           })
         )}
       </div>
+
+      <AvaliacaoPeekModal
+        avaliacao={peekAvaliacao}
+        origemY={peek?.origemY ?? 0}
+        selecionada={peekAvaliacao ? selectedIds.includes(peekAvaliacao.id) : false}
+        onToggleSelect={() => peekAvaliacao && toggleSelect(peekAvaliacao.id)}
+        onClose={() => setPeek(null)}
+      />
 
       <div className="hidden sm:block bg-white dark:bg-zinc-800 shadow-md rounded-xl overflow-hidden">
         <table className="w-full text-sm border-collapse">
@@ -495,39 +515,43 @@ export function AvaliacoesTable({
       </div>
 
       {totalPages > 1 && (
-        <div className="flex items-center justify-between mt-3">
-          <span className="text-xs text-zinc-500 dark:text-zinc-400">
+        <div className="mt-3 flex flex-col items-center gap-3 sm:flex-row sm:justify-between">
+          <span className="whitespace-nowrap text-xs text-zinc-500 dark:text-zinc-400">
             {allData.length} resultado{allData.length !== 1 ? "s" : ""}
           </span>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center justify-center gap-2">
             <button
               onClick={() => onPageChange(1)}
               disabled={page === 1}
-              className="px-3 py-1.5 rounded-lg border border-zinc-300 dark:border-zinc-600 text-zinc-600 dark:text-zinc-300 text-xs disabled:opacity-30 hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors"
+              aria-label="Primeira página"
+              className="whitespace-nowrap px-3 py-1.5 rounded-lg border border-zinc-300 dark:border-zinc-600 text-zinc-600 dark:text-zinc-300 text-xs disabled:opacity-30 hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors"
             >
               «
             </button>
             <button
               onClick={() => onPageChange(page - 1)}
               disabled={page === 1}
-              className="px-3 py-1.5 rounded-lg border border-zinc-300 dark:border-zinc-600 text-zinc-600 dark:text-zinc-300 text-xs disabled:opacity-30 hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors"
+              aria-label="Página anterior"
+              className="whitespace-nowrap px-3 py-1.5 rounded-lg border border-zinc-300 dark:border-zinc-600 text-zinc-600 dark:text-zinc-300 text-xs disabled:opacity-30 hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors"
             >
-              ← Anterior
+              ←<span className="hidden sm:inline"> Anterior</span>
             </button>
-            <span className="text-xs text-zinc-500 dark:text-zinc-400">
+            <span className="whitespace-nowrap px-1 text-xs text-zinc-500 dark:text-zinc-400">
               {page} / {totalPages}
             </span>
             <button
               onClick={() => onPageChange(page + 1)}
               disabled={page === totalPages}
-              className="px-3 py-1.5 rounded-lg border border-zinc-300 dark:border-zinc-600 text-zinc-600 dark:text-zinc-300 text-xs disabled:opacity-30 hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors"
+              aria-label="Próxima página"
+              className="whitespace-nowrap px-3 py-1.5 rounded-lg border border-zinc-300 dark:border-zinc-600 text-zinc-600 dark:text-zinc-300 text-xs disabled:opacity-30 hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors"
             >
-              Próxima →
+              <span className="hidden sm:inline">Próxima </span>→
             </button>
             <button
               onClick={() => onPageChange(totalPages)}
               disabled={page === totalPages}
-              className="px-3 py-1.5 rounded-lg border border-zinc-300 dark:border-zinc-600 text-zinc-600 dark:text-zinc-300 text-xs disabled:opacity-30 hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors"
+              aria-label="Última página"
+              className="whitespace-nowrap px-3 py-1.5 rounded-lg border border-zinc-300 dark:border-zinc-600 text-zinc-600 dark:text-zinc-300 text-xs disabled:opacity-30 hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors"
             >
               »
             </button>
