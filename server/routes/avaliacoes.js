@@ -1,33 +1,53 @@
 const express = require('express')
 const router = express.Router()
 const pool = require('../database/database')
+const rateLimit = require('../middleware/rateLimit')
+const { LOJAS } = require('../lojas')
 const { autenticar, requireAvaliacoesAccess, requireAvaliacoesAdmin } = require('./auth')
 
-router.post('/loja/:lojaId', async (req, res) => {
-  const { lojaId } = req.params
-  const { nomeLoja, nota, comentario } = req.body
+const COMENTARIO_MAX = 500
 
-  if (!lojaId || !nota) {
-    return res.status(400).json({ erro: 'Loja e nota são obrigatórios' })
+const limitarEnvio = rateLimit({ windowMs: 10 * 60 * 1000, max: 30 })
+
+router.post('/loja/:lojaId', limitarEnvio, async (req, res) => {
+  const lojaId = Number(req.params.lojaId)
+  const { nota, comentario } = req.body ?? {}
+
+  if (!Number.isInteger(lojaId) || !LOJAS[lojaId]) {
+    return res.status(400).json({ erro: 'Loja inválida' })
+  }
+
+  if (!Number.isInteger(nota) || nota < 1 || nota > 5) {
+    return res.status(400).json({ erro: 'A nota deve ser um número inteiro de 1 a 5' })
+  }
+
+  if (comentario != null && typeof comentario !== 'string') {
+    return res.status(400).json({ erro: 'Comentário inválido' })
+  }
+
+  const comentarioLimpo = comentario?.trim() || null
+
+  if (comentarioLimpo && comentarioLimpo.length > COMENTARIO_MAX) {
+    return res.status(400).json({ erro: `O comentário deve ter no máximo ${COMENTARIO_MAX} caracteres` })
   }
 
   const data = new Date().toISOString()
   await pool.query(
     'INSERT INTO avaliacoes (idfilial, nomefilial, nota, comentario, data) VALUES ($1, $2, $3, $4, $5)',
-    [lojaId, nomeLoja, nota, comentario || null, data]
+    [lojaId, LOJAS[lojaId], nota, comentarioLimpo, data]
   )
 
   res.json({ sucesso: true })
 })
 
 router.delete('/loja/:id', autenticar, requireAvaliacoesAccess, requireAvaliacoesAdmin, async (req, res) => {
-  const { id } = req.params
+  const id = Number(req.params.id)
 
-  if (!id) {
-    return res.status(400).json({ erro: 'Id da avaliação obrigatório' })
+  if (!Number.isInteger(id)) {
+    return res.status(400).json({ erro: 'Id da avaliação inválido' })
   }
 
-  const { rows: [avaliacao] } = await pool.query('SELECT idfilial FROM avaliacoes WHERE id = $1', [Number(id)])
+  const { rows: [avaliacao] } = await pool.query('SELECT idfilial FROM avaliacoes WHERE id = $1', [id])
 
   if (!avaliacao) {
     return res.status(404).json({ erro: 'Avaliação não encontrada' })
@@ -37,7 +57,7 @@ router.delete('/loja/:id', autenticar, requireAvaliacoesAccess, requireAvaliacoe
     return res.status(403).json({ erro: 'Sem permissão para excluir avaliações desta filial.' })
   }
 
-  await pool.query('DELETE FROM avaliacoes WHERE id = $1', [Number(id)])
+  await pool.query('DELETE FROM avaliacoes WHERE id = $1', [id])
 
   res.json({ sucesso: true })
 })

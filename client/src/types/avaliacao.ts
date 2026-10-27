@@ -3,17 +3,56 @@ export interface AvaliacaoPayload {
   comentario: string | null;
 }
 
-export interface LojaInfo {
+export interface AvaliacaoApi {
   id: number;
-  nome: string;
+  idfilial: number;
+  nomefilial: string;
+  nota: number;
+  comentario: string | null;
+  data: string;
 }
 
+export interface LojaInfo {
+  id: number;
+  /** Nome exibido ao cliente no formulário */
+  nome: string;
+  /** Nome gravado no banco (avaliacoes.nomefilial) */
+  nomeCurto: string;
+  googleLink?: string;
+}
+
+export const TELEVENDAS_ID = 5;
+
 export const LOJAS: Record<number, LojaInfo> = {
-  1: { id: 1, nome: "Loja Prado" },
-  2: { id: 2, nome: "Loja Centro" },
-  3: { id: 3, nome: "Loja Olaria" },
-  4: { id: 4, nome: "Loja Teresópolis" },
-  5: { id: 5, nome: "Televendas" },
+  1: {
+    id: 1,
+    nome: "Loja Prado",
+    nomeCurto: "Prado",
+    googleLink: "https://share.google/wuGWw3HAoDMr4W85S",
+  },
+  2: {
+    id: 2,
+    nome: "Loja Centro",
+    nomeCurto: "Centro",
+    googleLink: "https://share.google/xeXvVPvSIjM9jONa1",
+  },
+  3: {
+    id: 3,
+    nome: "Loja Olaria",
+    nomeCurto: "Olaria",
+    googleLink: "https://share.google/d6AqrNY9eXndwbPKr",
+  },
+  4: {
+    id: 4,
+    nome: "Loja Teresópolis",
+    nomeCurto: "Teresopolis",
+    googleLink: "https://share.google/BBYlzETG0WP0aLXnP",
+  },
+  [TELEVENDAS_ID]: {
+    id: TELEVENDAS_ID,
+    nome: "Televendas",
+    nomeCurto: "Televendas",
+  },
 };
 
 

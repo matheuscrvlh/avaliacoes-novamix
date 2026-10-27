@@ -1,8 +1,7 @@
 import { useState, useCallback } from "react";
 import { postAvaliacao } from "@/lib/api";
+import { TELEVENDAS_ID } from "@/types/avaliacao";
 import type { SubmitStatus } from "@/types/avaliacao";
-
-const TELEVENDAS_ID = 5;
 
 export function useTelevendasAvaliacao() {
   const [nota, setNota] = useState<number>(0);

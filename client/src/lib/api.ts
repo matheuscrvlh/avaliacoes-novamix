@@ -1,5 +1,5 @@
 /// <reference types="vite/client" />
-import type { AvaliacaoPayload } from "@/types/avaliacao";
+import type { AvaliacaoApi, AvaliacaoPayload } from "@/types/avaliacao";
 
 const BASE_URL = import.meta.env.VITE_API_URL ?? "https://avaliacoes.lojanovamix.com.br/api";
 export const HUB_URL = import.meta.env.VITE_HUB_URL ?? "https://hub.lojanovamix.com.br";
@@ -8,16 +8,17 @@ function redirectToHub() {
   window.location.href = HUB_URL;
 }
 
-const LOJAS: Record<number, string> = {
-  1: 'Prado',
-  2: 'Centro',
-  3: 'Olaria',
-  4: 'Teresopolis',
-  5: 'Televendas',
-};
+async function lerErro(response: Response): Promise<string> {
+  const text = await response.text().catch(() => "");
 
-export function getNomeLoja(lojaId: number): string {
-  return LOJAS[lojaId] ?? 'Loja desconhecida';
+  try {
+    const erro = JSON.parse(text)?.erro;
+    if (typeof erro === "string") return erro;
+  } catch {
+    // resposta não é JSON
+  }
+
+  return `Erro ${response.status}: ${text || response.statusText}`;
 }
 
 export interface SessaoAvaliacoes {
@@ -36,7 +37,7 @@ export async function getSessao(): Promise<SessaoAvaliacoes | null> {
   return response.json();
 }
 
-export async function getAvaliacoes() {
+export async function getAvaliacoes(): Promise<AvaliacaoApi[]> {
   const response = await fetch(`${BASE_URL}/dashboard`, {
     method: "GET",
     headers: { "Content-Type": "application/json" },
@@ -46,6 +47,10 @@ export async function getAvaliacoes() {
   if (response.status === 401) {
     redirectToHub();
     return [];
+  }
+
+  if (!response.ok) {
+    throw new Error(await lerErro(response));
   }
 
   return response.json();
@@ -64,8 +69,7 @@ export async function deleteAvaliacao(id: number): Promise<void> {
   }
 
   if (!response.ok) {
-    const text = await response.text().catch(() => "");
-    throw new Error(`Erro ${response.status}: ${text || response.statusText}`);
+    throw new Error(await lerErro(response));
   }
 }
 
@@ -73,16 +77,13 @@ export async function postAvaliacao(
   lojaId: number,
   payload: AvaliacaoPayload
 ): Promise<void> {
-  const nomeLoja = getNomeLoja(lojaId);
-
   const response = await fetch(`${BASE_URL}/avaliacoes/loja/${lojaId}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ ...payload, nomeLoja}),
+    body: JSON.stringify(payload),
   });
 
   if (!response.ok) {
-    const text = await response.text().catch(() => "");
-    throw new Error(`Erro ${response.status}: ${text || response.statusText}`);
+    throw new Error(await lerErro(response));
   }
 }

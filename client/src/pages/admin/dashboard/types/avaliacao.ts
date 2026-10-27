@@ -1,9 +1,5 @@
-export interface Avaliacao {
-  id: number
-  idfilial: number
-  nomefilial: string
-  nota: number
-  comentario: string
-  data: string
+import type { AvaliacaoApi } from "@/types/avaliacao"
+
+export interface Avaliacao extends AvaliacaoApi {
   tipo: 'loja' | 'televendas'
 }
