@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Menu, X, LogOut } from "lucide-react";
 import { HUB_URL } from "../../../../lib/api";
 import type { DashboardTab } from "../hooks/useDashBoard";
 
 interface SidebarProps {
-  activeTab: DashboardTab;
-  onTabChange: (tab: DashboardTab) => void;
+  activeTab: DashboardTab | "relatorios";
+  /** Na página do dashboard troca a aba sem sair dela; fora dele, navega até lá */
+  onTabChange?: (tab: DashboardTab) => void;
 }
 
 const linkBase =
@@ -17,6 +18,7 @@ const linkInactive =
 
 export function Sidebar({ activeTab, onTabChange }: SidebarProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!isOpen) return;
@@ -33,7 +35,13 @@ export function Sidebar({ activeTab, onTabChange }: SidebarProps) {
   }
 
   function selecionarTab(tab: DashboardTab) {
-    onTabChange(tab);
+    if (onTabChange) onTabChange(tab);
+    else navigate(tab === "loja" ? "/dashboard" : "/dashboard?aba=televendas");
+    fechar();
+  }
+
+  function abrirRelatorios() {
+    navigate("/dashboard/relatorios");
     fechar();
   }
 
@@ -82,6 +90,13 @@ export function Sidebar({ activeTab, onTabChange }: SidebarProps) {
             className={`${linkBase} ${activeTab === "televendas" ? linkActive : linkInactive}`}
           >
             Televendas
+          </button>
+          <button
+            type="button"
+            onClick={abrirRelatorios}
+            className={`${linkBase} ${activeTab === "relatorios" ? linkActive : linkInactive}`}
+          >
+            Relatórios
           </button>
           <Link
             to="/"

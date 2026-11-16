@@ -20,10 +20,17 @@ app.use(express.json());
 const avaliacoes = require("./routes/avaliacoes");
 const dashboard = require("./routes/dashboard");
 const auth = require("./routes/auth");
+const supervisores = require("./routes/supervisores");
+const relatorios = require("./routes/relatorios");
+const { executarMigracoes } = require("./database/migracoes");
 
 app.use("/avaliacoes", avaliacoes);
 app.use("/dashboard", dashboard);
 app.use("/auth", auth);
+app.use("/supervisores", supervisores);
+app.use("/relatorios", relatorios);
+
+executarMigracoes();
 
 app.use((err, req, res, next) => {
   console.error(err);

@@ -1,5 +1,9 @@
 // Limitador em memória por IP (req.ip). Suficiente para uma única instância do servidor.
-function rateLimit({ windowMs, max }) {
+function rateLimit({
+  windowMs,
+  max,
+  mensagem = "Muitas avaliações enviadas. Tente novamente em alguns minutos.",
+}) {
   const hits = new Map();
 
   setInterval(() => {
@@ -22,7 +26,7 @@ function rateLimit({ windowMs, max }) {
 
     if (entry.count > max) {
       res.set("Retry-After", String(Math.ceil((entry.reset - now) / 1000)));
-      return res.status(429).json({ erro: "Muitas avaliações enviadas. Tente novamente em alguns minutos." });
+      return res.status(429).json({ erro: mensagem });
     }
 
     next();
