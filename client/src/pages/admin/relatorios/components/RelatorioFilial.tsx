@@ -32,6 +32,19 @@ const COR_BARRA: Record<number, string> = {
   1: "bg-red-500",
 };
 
+// Mesmas cores da distribuição, na faixa à esquerda de cada avaliação
+const COR_FAIXA: Record<number, string> = {
+  5: "border-l-green-500",
+  4: "border-l-green-400",
+  3: "border-l-amber-400",
+  2: "border-l-orange-400",
+  1: "border-l-red-500",
+};
+
+function maisRecentePrimeiro(a: AvaliacaoApi, b: AvaliacaoApi) {
+  return new Date(b.data).getTime() - new Date(a.data).getTime();
+}
+
 interface RelatorioFilialProps {
   nomeLoja: string;
   periodo: Periodo;
@@ -40,10 +53,69 @@ interface RelatorioFilialProps {
   /** Avaliações da filial dentro do período */
   avaliacoes: AvaliacaoApi[];
   anterior: Resumo;
-  /** Limite de comentários (imagem). Sem limite, lista todos (PDF). */
-  maxComentarios?: number;
   /** Identifica o relatório na hora de exportar */
   marcador?: string;
+}
+
+function ItemAvaliacao({ avaliacao: a }: { avaliacao: AvaliacaoApi }) {
+  return (
+    <div
+      data-quebra
+      className={`rounded-xl border border-l-4 border-zinc-200 bg-zinc-50 px-4 py-3 ${COR_FAIXA[a.nota] ?? ""}`}
+    >
+      <div className="flex items-center justify-between text-xs">
+        <span className="font-bold tracking-wider text-amber-500">
+          {"★".repeat(a.nota)}
+          <span className="text-zinc-300">{"★".repeat(5 - a.nota)}</span>
+          <span className="ml-1.5 tracking-normal text-zinc-600">{a.nota}</span>
+        </span>
+        <span className="text-zinc-500">{formatoQuando.format(new Date(a.data))}</span>
+      </div>
+      {a.comentario?.trim() ? (
+        <p className="mt-1.5 whitespace-pre-wrap break-words text-sm leading-relaxed text-zinc-700">
+          {a.comentario}
+        </p>
+      ) : (
+        <p className="mt-1.5 text-sm italic text-zinc-400">Sem comentário</p>
+      )}
+    </div>
+  );
+}
+
+function SecaoAvaliacoes({
+  titulo,
+  detalhe,
+  vazio,
+  itens,
+}: {
+  titulo: string;
+  detalhe?: string;
+  vazio: string;
+  itens: AvaliacaoApi[];
+}) {
+  return (
+    <section className="mt-8">
+      <h2 className="text-xs font-bold uppercase tracking-wide text-zinc-500">
+        {titulo} ({itens.length})
+        {detalhe && itens.length > 1 && (
+          <span className="ml-2 font-medium normal-case tracking-normal text-zinc-400">
+            {detalhe}
+          </span>
+        )}
+      </h2>
+      {itens.length === 0 ? (
+        <p data-quebra className="mt-3 text-sm text-zinc-500">
+          {vazio}
+        </p>
+      ) : (
+        <div className="mt-3 space-y-2.5">
+          {itens.map((a) => (
+            <ItemAvaliacao key={a.id} avaliacao={a} />
+          ))}
+        </div>
+      )}
+    </section>
+  );
 }
 
 function Variacao({
@@ -104,21 +176,20 @@ export function RelatorioFilial({
   hoje,
   avaliacoes,
   anterior,
-  maxComentarios,
   marcador,
 }: RelatorioFilialProps) {
   const resumo = useMemo(() => resumir(avaliacoes), [avaliacoes]);
 
-  const comentarios = useMemo(
-    () =>
-      avaliacoes
-        .filter((a) => a.comentario?.trim())
-        .sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime()),
+  // Toda nota abaixo de 5 aparece (com ou sem comentário), da pior para a melhor.
+  // Das notas 5, aparecem as que têm comentário.
+  const abaixoDe5 = useMemo(
+    () => avaliacoes.filter((a) => a.nota < 5).sort((a, b) => a.nota - b.nota || maisRecentePrimeiro(a, b)),
     [avaliacoes],
   );
-
-  const visiveis = maxComentarios ? comentarios.slice(0, maxComentarios) : comentarios;
-  const restantes = comentarios.length - visiveis.length;
+  const comentarios5 = useMemo(
+    () => avaliacoes.filter((a) => a.nota === 5 && a.comentario?.trim()).sort(maisRecentePrimeiro),
+    [avaliacoes],
+  );
 
   const semanal = periodo.tipo === "semana";
   const parcial = periodo.fim > hoje;
@@ -234,52 +305,27 @@ export function RelatorioFilial({
             </div>
           </section>
 
-          <section className="mt-8">
-            <h2 className="text-xs font-bold uppercase tracking-wide text-zinc-500">
-              Comentários dos clientes ({comentarios.length})
-            </h2>
+          <SecaoAvaliacoes
+            titulo="Notas abaixo de 5 ★"
+            detalhe="da pior para a melhor"
+            vazio="Nenhuma nota abaixo de 5 ★ neste período."
+            itens={abaixoDe5}
+          />
 
-            {comentarios.length === 0 ? (
-              <p data-quebra className="mt-3 text-sm text-zinc-500">
-                Nenhum comentário escrito neste período.
-              </p>
-            ) : (
-              <div className="mt-3 space-y-2.5">
-                {visiveis.map((a) => (
-                  <div
-                    key={a.id}
-                    data-quebra
-                    className="rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3"
-                  >
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="font-bold tracking-wider text-amber-500">
-                        {"★".repeat(a.nota)}
-                        <span className="text-zinc-300">{"★".repeat(5 - a.nota)}</span>
-                      </span>
-                      <span className="text-zinc-500">{formatoQuando.format(new Date(a.data))}</span>
-                    </div>
-                    <p className="mt-1.5 whitespace-pre-wrap break-words text-sm leading-relaxed text-zinc-700">
-                      {a.comentario}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {restantes > 0 && (
-              <p data-quebra className="mt-3 text-sm font-semibold text-orange-600">
-                + {restantes} comentário{restantes > 1 ? "s" : ""} no PDF completo.
-              </p>
-            )}
-          </section>
+          <SecaoAvaliacoes
+            titulo="Comentários com 5 ★"
+            vazio="Nenhum comentário com nota 5 neste período."
+            itens={comentarios5}
+          />
         </>
       )}
 
+      {/* No PDF este rodapé não entra: o "Gerado em" vai na margem de cada folha */}
       <footer
-        data-quebra
+        data-rodape
         className="mt-10 flex justify-between border-t border-zinc-200 pt-4 text-[11px] text-zinc-400"
       >
-        <span>Gerado em {formatoGeradoEm.format(new Date())}</span>
+        <span data-gerado-em>Gerado em {formatoGeradoEm.format(new Date())}</span>
         <span>Novamix Food Service · Avaliações de atendimento</span>
       </footer>
     </div>

@@ -34,11 +34,12 @@ export async function gerarPng(no: HTMLElement): Promise<Blob> {
 }
 
 // Posições (px, a partir do topo do relatório) onde a página pode ser cortada:
-// o fim de cada bloco marcado com data-quebra. Assim nenhum comentário fica partido ao meio.
+// logo abaixo de cada bloco marcado com data-quebra. Assim nenhuma avaliação fica partida
+// ao meio. Os 3 px a mais caem no espaço entre blocos e evitam um fio da borda na folha seguinte.
 function pontosDeQuebra(no: HTMLElement) {
   const topo = no.getBoundingClientRect().top;
   return [...no.querySelectorAll<HTMLElement>("[data-quebra]")]
-    .map((el) => el.getBoundingClientRect().bottom - topo)
+    .map((el) => Math.ceil(el.getBoundingClientRect().bottom - topo) + 3)
     .sort((a, b) => a - b);
 }
 
@@ -70,7 +71,13 @@ export async function gerarPdf(no: HTMLElement): Promise<Blob> {
   const largura = no.offsetWidth;
   const escala = canvas.width / largura;
   const pxPorMm = largura / A4_LARGURA_MM;
-  const paginas = paginar(no.offsetHeight, pontosDeQuebra(no), pxPorMm);
+  const pontos = pontosDeQuebra(no);
+  // O rodapé do relatório fica de fora (iria parar sozinho numa folha nova);
+  // o "Gerado em" é escrito na margem de baixo de cada folha
+  const fimConteudo = Math.min(no.offsetHeight, pontos[pontos.length - 1] ?? no.offsetHeight);
+  const paginas = paginar(fimConteudo, pontos, pxPorMm);
+  const geradoEm = no.querySelector("[data-gerado-em]")?.textContent ?? "";
+  const margemLateralMm = 40 / pxPorMm; // mesmo respiro lateral do relatório (p-10)
 
   const pdf = new jsPDF({ unit: "mm", format: "a4", compress: true });
   const fatia = document.createElement("canvas");
@@ -98,13 +105,12 @@ export async function gerarPdf(no: HTMLElement): Promise<Blob> {
       h / escala / pxPorMm,
     );
 
-    if (paginas.length > 1) {
-      pdf.setFontSize(8);
-      pdf.setTextColor(150);
-      pdf.text(`Página ${i + 1} de ${paginas.length}`, A4_LARGURA_MM / 2, A4_ALTURA_MM - 5, {
-        align: "center",
-      });
-    }
+    pdf.setFontSize(8);
+    pdf.setTextColor(150);
+    pdf.text(geradoEm, margemLateralMm, A4_ALTURA_MM - 5);
+    pdf.text(`Página ${i + 1} de ${paginas.length}`, A4_LARGURA_MM - margemLateralMm, A4_ALTURA_MM - 5, {
+      align: "right",
+    });
   });
 
   return pdf.output("blob");

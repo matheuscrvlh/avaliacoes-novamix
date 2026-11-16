@@ -52,10 +52,6 @@ import type {
 type Formato = "imagem" | "pdf";
 type Acao = "baixar" | "compartilhar" | "whatsapp" | "lote";
 
-// A imagem vai para o WhatsApp como foto: com comentários demais ela fica comprida e
-// ilegível. O PDF traz todos.
-const MAX_COMENTARIOS_IMAGEM = 10;
-
 interface AvaliacaoComDia extends AvaliacaoApi {
   /** AAAA-MM-DD em São Paulo, calculado uma vez no carregamento */
   dia: string;
@@ -383,7 +379,6 @@ export default function RelatoriosPage() {
   const ehPeriodoAtual = periodo.inicio === periodoPadrao(periodo.tipo, hoje).inicio;
 
   const supervisoresAtuais = idfilial === null ? [] : supervisoresDaFilial(idfilial);
-  const comentariosNoPeriodo = atual?.doPeriodo.filter((a) => a.comentario?.trim()).length ?? 0;
   const chaveAtual = idfilial === null ? "" : chaveDe(idfilial, periodo);
 
   return (
@@ -563,13 +558,6 @@ export default function RelatoriosPage() {
                       </button>
                     </div>
 
-                    {formato === "imagem" && comentariosNoPeriodo > MAX_COMENTARIOS_IMAGEM && (
-                      <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400">
-                        A imagem mostra os {MAX_COMENTARIOS_IMAGEM} comentários mais recentes. O
-                        PDF traz todos os {comentariosNoPeriodo}.
-                      </p>
-                    )}
-
                     <div className="mt-3 flex gap-2">
                       <button
                         type="button"
@@ -664,7 +652,6 @@ export default function RelatoriosPage() {
                       hoje={hoje}
                       avaliacoes={atual.doPeriodo}
                       anterior={atual.anterior}
-                      maxComentarios={formato === "imagem" ? MAX_COMENTARIOS_IMAGEM : undefined}
                     />
                   </PreviaDocumento>
                 </div>
@@ -726,7 +713,6 @@ export default function RelatoriosPage() {
               hoje={hoje}
               avaliacoes={dados.doPeriodo}
               anterior={dados.anterior}
-              maxComentarios={item.formato === "imagem" ? MAX_COMENTARIOS_IMAGEM : undefined}
             />
           );
         })}
