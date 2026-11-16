@@ -15,7 +15,7 @@ const configurado = Boolean(SMTP_HOST && SMTP_USER && SMTP_PASS && EMAIL_AVALIAC
 if (!configurado) {
   console.warn(
     "[email] SMTP_HOST, SMTP_USER, SMTP_PASS ou EMAIL_AVALIACAO_DESTINO não definidos no .env: " +
-      "avaliações com nota baixa serão gravadas no banco em vez de enviadas por e-mail."
+      "não haverá alerta por e-mail para avaliações com nota baixa (elas continuam sendo gravadas)."
   );
 }
 
