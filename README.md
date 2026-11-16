@@ -64,14 +64,13 @@ Página **Relatórios** no menu lateral, feita para o envio de toda sexta-feira 
   - **Semanal**: de sábado a sexta. Assim os envios de sexta cobrem todos os dias, sem buracos nem repetições. Abre na semana que terminou na última sexta (ou hoje, se for sexta).
   - **Mensal**: mês do calendário. Abre no mês atual.
   - As setas navegam para períodos anteriores. Período ainda em andamento aparece como "parcial".
-- O relatório traz total, nota média, % de notas 5, comentários, distribuição das notas e a lista de comentários, com setas de variação em relação ao período anterior. Em período parcial a quantidade não é comparada, porque um período incompleto sempre teria menos avaliações.
-- **Imagem (PNG)**: mostra até 10 comentários (os mais recentes), para continuar legível como foto no WhatsApp. **PDF**: traz todos, em folhas A4, sem cortar nenhum comentário entre páginas.
+- O relatório traz total, nota média, % de notas 5, comentários e distribuição das notas, com setas de variação em relação ao período anterior. Em período parcial a quantidade não é comparada, porque um período incompleto sempre teria menos avaliações.
+- Lista de avaliações em duas partes: **todas as notas abaixo de 5** (com ou sem comentário, da pior para a melhor) e **todos os comentários com nota 5** (mais recentes primeiro). Notas 5 sem comentário só entram na contagem.
+- **Imagem (PNG)** e **PDF** têm o mesmo conteúdo. O PDF sai em folhas A4, sem cortar nenhuma avaliação entre páginas.
 - **Baixar** ou **Compartilhar**: no celular (e no Chrome/Edge do Windows) abre a tela de compartilhar do sistema, de onde dá para escolher o WhatsApp e o contato.
 - **Supervisores**: cada filial tem uma lista de supervisores com nome e WhatsApp. O ícone do WhatsApp ao lado de cada um abre a conversa com a mensagem já escrita.
 - **Envio direto pelo WhatsApp** (quando a API está configurada, ver abaixo): o botão "Enviar PDF pelo WhatsApp" manda o PDF da filial para todos os supervisores dela, e "Enviar todas as filiais" faz isso para cada filial de uma vez, sempre com confirmação antes.
 - Imagem e PDF são gerados no próprio navegador. As bibliotecas (`modern-screenshot` e `jspdf`) só são baixadas no primeiro clique em exportar.
-
-> Lembrete: como as avaliações com nota menor que 4 vão por e-mail e não são gravadas (ver "Notas baixas vão por e-mail"), elas também não aparecem nos relatórios.
 
 ---
 
@@ -188,12 +187,13 @@ Client em `http://localhost:8082` e server em `http://localhost:3002`.
 
 O `POST /avaliacoes/loja/:lojaId` é público, então o servidor valida: loja existente, nota inteira de 1 a 5 e comentário com até 500 caracteres. O nome da filial é definido pelo servidor, e há limite de 30 envios a cada 10 minutos por IP.
 
-## Notas baixas vão por e-mail
+## Notas baixas também geram alerta por e-mail
 
-Avaliações novas com nota **menor que 4** (em qualquer loja ou no Televendas) são enviadas por e-mail para `EMAIL_AVALIACAO_DESTINO` e **não são gravadas no banco**, então não aparecem no dashboard nem entram nas métricas (nota média e % de 5★ ficam acima da realidade). As avaliações antigas permanecem como estão.
+Toda avaliação é gravada no banco e aparece no dashboard, nas métricas e nos relatórios. As com nota **menor que 4** (em qualquer loja ou no Televendas) também geram um alerta por e-mail para `EMAIL_AVALIACAO_DESTINO`.
 
-- Se o e-mail falhar, o cliente recebe um erro (503) e pode tentar de novo.
-- Se o SMTP não estiver configurado no `.env`, essas avaliações são gravadas no banco normalmente, para não se perderem.
+- Se o e-mail falhar, a falha fica só no log do servidor: a avaliação já está salva e o cliente vê a confirmação normalmente.
+- Sem SMTP configurado no `.env`, não há alerta por e-mail.
+- Até novembro de 2026 as notas menores que 4 iam **só** por e-mail e não eram gravadas; essas avaliações antigas não aparecem no dashboard nem nos relatórios.
 
 ---
 
