@@ -7,6 +7,7 @@ import { PrivateRoute } from "./components/auth/PrivateRoute";
 import AvaliacaoPage from "@/pages/public/AvaliacaoPage";
 import TelevendasPage from "@/pages/public/TelevendasPage";
 import DashboardPage from "@/pages/admin/DashboardPage";
+import RelatoriosPage from "@/pages/admin/RelatoriosPage";
 
 export default function App() {
   return (
@@ -20,6 +21,14 @@ export default function App() {
           element={
             <PrivateRoute>
               <DashboardPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/dashboard/relatorios"
+          element={
+            <PrivateRoute>
+              <RelatoriosPage />
             </PrivateRoute>
           }
         />

@@ -10,4 +10,7 @@ const LOJAS = {
   5: "Televendas",
 };
 
-module.exports = { LOJAS, PRADO_ID, TELEVENDAS_ID };
+// Nome com acentos, usado em mensagens (relatório enviado pelo WhatsApp)
+const NOMES_EXIBICAO = { ...LOJAS, 4: "Teresópolis" };
+
+module.exports = { LOJAS, NOMES_EXIBICAO, PRADO_ID, TELEVENDAS_ID };
